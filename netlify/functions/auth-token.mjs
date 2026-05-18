@@ -11,15 +11,25 @@ export async function handler(request) {
 
   try {
     const payload = JSON.parse(request.body || '{}')
-    const { baseUrl, clientId, clientSecret } = payload
+    const {
+      baseUrl: inputBaseUrl,
+      clientId: inputClientId,
+      clientSecret: inputClientSecret
+    } = payload
+
+    const baseUrl = (inputBaseUrl || process.env.SNOW_BASE_URL || '').trim()
+    const clientId = (inputClientId || process.env.SNOW_CLIENT_ID || '').trim()
+    const clientSecret = (inputClientSecret || process.env.SNOW_CLIENT_SECRET || '').trim()
 
     if (!baseUrl || !clientId || !clientSecret) {
       return {
-        statusCode: 400,
+        statusCode: 500,
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ error: 'Missing required fields' })
+        body: JSON.stringify({
+          error: 'Netlify auth configuration is incomplete. Set SNOW_BASE_URL, SNOW_CLIENT_ID, SNOW_CLIENT_SECRET.'
+        })
       }
     }
 
@@ -39,10 +49,18 @@ export async function handler(request) {
 
     const text = await response.text()
 
+    // Avoid browser-native auth popups from upstream 401 challenges.
+    // We intentionally map upstream 401 to 400 and return JSON.
+    let statusCode = response.status
+    if (statusCode === 401) {
+      statusCode = 400
+    }
+
     return {
-      statusCode: response.status,
+      statusCode,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store'
       },
       body: text
     }

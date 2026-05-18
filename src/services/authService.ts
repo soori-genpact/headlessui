@@ -22,6 +22,7 @@ class AuthService {
   private apiClient: AxiosInstance | null = null
   private tokenRefreshTimer: ReturnType<typeof setTimeout> | null = null
   private refreshPromise: Promise<TokenData> | null = null
+  private runtimeConfig: AuthConfig | null = null
   private authClient = axios.create({
     timeout: 30000
   })
@@ -38,6 +39,13 @@ class AuthService {
   }
 
   getConfig(): AuthConfig | null {
+    if (this.runtimeConfig) {
+      return {
+        ...this.runtimeConfig,
+        baseUrl: this.normalizeBaseUrl(this.runtimeConfig.baseUrl)
+      }
+    }
+
     const config = localStorage.getItem(STORAGE_KEYS.CONFIG)
     if (!config) return null
 
@@ -48,14 +56,41 @@ class AuthService {
     }
   }
 
-  setConfig(config: AuthConfig): void {
+  setConfig(config: AuthConfig, options?: { persist?: boolean }): void {
     const normalizedConfig: AuthConfig = {
       ...config,
       baseUrl: this.normalizeBaseUrl(config.baseUrl)
     }
 
-    localStorage.setItem(STORAGE_KEYS.CONFIG, JSON.stringify(normalizedConfig))
+    this.runtimeConfig = normalizedConfig
+    if (options?.persist !== false) {
+      localStorage.setItem(STORAGE_KEYS.CONFIG, JSON.stringify(normalizedConfig))
+    }
     this.initializeApiClient()
+  }
+
+  async loadManagedConfig(): Promise<boolean> {
+    try {
+      const response = await this.authClient.get('/api/app/config')
+      const data = response.data as { managedAuthEnabled?: boolean; baseUrl?: string }
+
+      if (!data?.managedAuthEnabled || !data.baseUrl) {
+        return false
+      }
+
+      this.setConfig(
+        {
+          baseUrl: data.baseUrl,
+          clientId: '',
+          clientSecret: ''
+        },
+        { persist: false }
+      )
+
+      return true
+    } catch {
+      return false
+    }
   }
 
   getToken(): TokenData | null {
@@ -223,10 +258,16 @@ class AuthService {
     this.tokenRefreshTimer = null
     this.refreshPromise = null
     this.apiClient = null
+    this.runtimeConfig = null
   }
 
   logout(): void {
-    this.clearAuth()
+    localStorage.removeItem(STORAGE_KEYS.TOKEN)
+    if (this.tokenRefreshTimer) {
+      clearTimeout(this.tokenRefreshTimer)
+    }
+    this.tokenRefreshTimer = null
+    this.refreshPromise = null
   }
 }
 

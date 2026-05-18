@@ -164,6 +164,23 @@ The application automatically:
    - Configure in Netlify dashboard if needed
    - Application primarily uses browser localStorage
 
+### Netlify Managed Authentication (Recommended)
+
+To avoid entering Base URL / Client ID / Client Secret in every browser:
+
+1. In Netlify, open your site:
+   - **Site configuration** -> **Environment variables**
+2. Add these variables:
+   - `SNOW_BASE_URL` = `https://your-instance.service-now.com`
+   - `SNOW_CLIENT_ID` = `your-client-id`
+   - `SNOW_CLIENT_SECRET` = `your-client-secret`
+3. Trigger a redeploy.
+4. Open the app again. It will auto-load auth config from Netlify and authenticate without browser-by-browser setup.
+
+Notes:
+- If these vars are not set, the app falls back to manual configuration page entry.
+- Credentials stay server-side in Netlify Functions and are not exposed in the UI.
+
 ### Environment Variables
 
 Optional environment variables in Netlify:

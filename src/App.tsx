@@ -29,33 +29,33 @@ function App() {
   const [versionId, setVersionId] = useState<string>('')
 
   useEffect(() => {
-    const { submissionSysId: submissionId, versionId: versionIdParam, isLegacyQueryFormat } = parseAuditLocation()
+    const initialize = async () => {
+      const { submissionSysId: submissionId, versionId: versionIdParam, isLegacyQueryFormat } = parseAuditLocation()
 
-    setSubmissionSysId(submissionId)
-    setVersionId(versionIdParam)
+      setSubmissionSysId(submissionId)
+      setVersionId(versionIdParam)
 
-    if (submissionId && isLegacyQueryFormat) {
-      const nextUrl = versionIdParam
-        ? `/audit/${submissionId}?version=${encodeURIComponent(versionIdParam)}`
-        : `/audit/${submissionId}`
-      window.history.replaceState({}, '', nextUrl)
-    }
+      if (submissionId && isLegacyQueryFormat) {
+        const nextUrl = versionIdParam
+          ? `/audit/${submissionId}?version=${encodeURIComponent(versionIdParam)}`
+          : `/audit/${submissionId}`
+        window.history.replaceState({}, '', nextUrl)
+      }
 
-    // Check if user is already authenticated
-    const config = authService.getConfig()
-    authService.initializeApiClient()
+      await authService.loadManagedConfig()
+      const config = authService.getConfig()
+      authService.initializeApiClient()
 
-    if (config) {
-      if (submissionId) {
+      if (config && submissionId) {
         setCurrentPage('audit')
       } else {
         setCurrentPage('config')
       }
-    } else {
-      setCurrentPage('config')
+
+      setIsInitialized(true)
     }
 
-    setIsInitialized(true)
+    initialize()
   }, [])
 
   const handleConfigSaved = () => {
