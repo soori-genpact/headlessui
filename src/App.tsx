@@ -2,22 +2,25 @@
 import authService from './services/authService'
 import { ConfigPage } from './pages/ConfigPage'
 import { AuditPage } from './pages/AuditPage'
+import { AuditPageV2 } from './pages/AuditPageV2'
 import { ToastProvider } from './context/ToastContext'
 import { ToastContainer } from './components/Toast'
 
-type AppPage = 'config' | 'audit'
+type AppPage = 'config' | 'audit' | 'audit-v2'
 
 function parseAuditLocation() {
   const { pathname, search } = window.location
   const params = new URLSearchParams(search)
-  const pathMatch = pathname.match(/^\/audit\/([^/]+)\/?$/)
+  const v2Match = pathname.match(/^\/audit\/v2\/([^/]+)\/?$/)
+  const pathMatch = v2Match ? null : pathname.match(/^\/audit\/([^/]+)\/?$/)
 
-  const submissionSysId = pathMatch?.[1] || params.get('submissionSysId') || ''
+  const submissionSysId = v2Match?.[1] || pathMatch?.[1] || params.get('submissionSysId') || ''
   const versionId = params.get('version') || params.get('versionId') || ''
 
   return {
     submissionSysId,
     versionId,
+    page: v2Match ? 'audit-v2' as const : 'audit' as const,
     isLegacyQueryFormat: !pathMatch && !!params.get('submissionSysId')
   }
 }
@@ -27,13 +30,20 @@ function App() {
   const [isInitialized, setIsInitialized] = useState(false)
   const [submissionSysId, setSubmissionSysId] = useState<string>('')
   const [versionId, setVersionId] = useState<string>('')
+  const [targetAuditPage, setTargetAuditPage] = useState<Extract<AppPage, 'audit' | 'audit-v2'>>('audit')
 
   useEffect(() => {
     const initialize = async () => {
-      const { submissionSysId: submissionId, versionId: versionIdParam, isLegacyQueryFormat } = parseAuditLocation()
+      const {
+        submissionSysId: submissionId,
+        versionId: versionIdParam,
+        page,
+        isLegacyQueryFormat
+      } = parseAuditLocation()
 
       setSubmissionSysId(submissionId)
       setVersionId(versionIdParam)
+      setTargetAuditPage(page)
 
       if (submissionId && isLegacyQueryFormat) {
         const nextUrl = versionIdParam
@@ -47,7 +57,7 @@ function App() {
       authService.initializeApiClient()
 
       if (config && submissionId) {
-        setCurrentPage('audit')
+        setCurrentPage(page)
       } else {
         setCurrentPage('config')
       }
@@ -59,7 +69,7 @@ function App() {
   }, [])
 
   const handleConfigSaved = () => {
-    setCurrentPage('audit')
+    setCurrentPage(targetAuditPage)
   }
 
   const handleLogout = () => {
@@ -83,6 +93,12 @@ function App() {
       <div className="app-container">
         {currentPage === 'config' ? (
           <ConfigPage onConfigSaved={handleConfigSaved} />
+        ) : currentPage === 'audit-v2' ? (
+          <AuditPageV2
+            onLogout={handleLogout}
+            submissionSysId={submissionSysId}
+            versionId={versionId}
+          />
         ) : (
           <AuditPage
             onLogout={handleLogout}

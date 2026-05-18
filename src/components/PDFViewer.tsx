@@ -13,6 +13,7 @@ interface PDFViewerProps {
   token?: string
   navigateSource?: string
   navigateKey?: number
+  sourceOverlays?: PDFSourceOverlay[]
 }
 
 interface Coordinate {
@@ -27,13 +28,29 @@ interface Coordinate {
   y4: number
 }
 
+export interface PDFSourceOverlay {
+  id: string
+  source: string
+  label?: string
+  tone?: 'review' | 'conflict' | 'missing' | 'validated'
+  isFocused?: boolean
+}
+
+interface OverlayCoordinate extends Coordinate {
+  overlayId: string
+  label?: string
+  tone: NonNullable<PDFSourceOverlay['tone']>
+  isFocused: boolean
+}
+
 export const PDFViewer: React.FC<PDFViewerProps> = ({
   attachmentId,
   documentName = 'Document',
   baseUrl,
   token,
   navigateSource,
-  navigateKey
+  navigateKey,
+  sourceOverlays = []
 }) => {
   const [scale, setScale] = useState(1)
   const [zoomMode, setZoomMode] = useState<'fit-width' | 'actual-size'>('actual-size')
@@ -43,7 +60,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null)
   const [error, setError] = useState('')
   const [pageSize, setPageSize] = useState<{ width: number; height: number } | null>(null)
-  const [highlightCoords, setHighlightCoords] = useState<Coordinate[]>([])
+  const [highlightCoords, setHighlightCoords] = useState<OverlayCoordinate[]>([])
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const annotationCanvasRef = useRef<HTMLCanvasElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -71,6 +88,18 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
       .split(';')
       .map((item) => parseCoordinateString(item.trim()))
       .filter((item): item is Coordinate => Boolean(item))
+  }
+
+  const buildOverlayCoordinates = (overlays: PDFSourceOverlay[]): OverlayCoordinate[] => {
+    return overlays.flatMap((overlay) =>
+      parseMultipleCoordinateStrings(overlay.source).map((coordinate) => ({
+        ...coordinate,
+        overlayId: overlay.id,
+        label: overlay.label,
+        tone: overlay.tone || 'review',
+        isFocused: Boolean(overlay.isFocused)
+      }))
+    )
   }
 
   useEffect(() => {
@@ -135,10 +164,26 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   }, [pdfDoc, currentPage, zoomMode])
 
   useEffect(() => {
+    if (sourceOverlays.length > 0) {
+      setHighlightCoords(buildOverlayCoordinates(sourceOverlays))
+      return
+    }
+
+    const parsed = parseMultipleCoordinateStrings(navigateSource).map((coordinate) => ({
+      ...coordinate,
+      overlayId: 'focused',
+      label: 'Focused field',
+      tone: 'review' as const,
+      isFocused: true
+    }))
+
+    setHighlightCoords(parsed)
+  }, [navigateSource, sourceOverlays])
+
+  useEffect(() => {
     if (!navigateKey) return
     const parsed = parseMultipleCoordinateStrings(navigateSource)
     if (!parsed.length) return
-    setHighlightCoords(parsed)
     const firstPage = parsed[0].page
     if (firstPage > 0) {
       setCurrentPage(firstPage)
@@ -173,6 +218,13 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
       const coordsOnPage = highlightCoords.filter((coord) => coord.page === currentPage)
       const toPixels = (value: number) => value * 72 * scale
 
+      const toneMap: Record<OverlayCoordinate['tone'], { fill: string; stroke: string }> = {
+        validated: { fill: 'rgba(22, 155, 98, 0.16)', stroke: 'rgba(22, 155, 98, 0.92)' },
+        review: { fill: 'rgba(217, 119, 6, 0.15)', stroke: 'rgba(217, 119, 6, 0.9)' },
+        conflict: { fill: 'rgba(225, 29, 72, 0.16)', stroke: 'rgba(225, 29, 72, 0.92)' },
+        missing: { fill: 'rgba(95, 107, 122, 0.14)', stroke: 'rgba(95, 107, 122, 0.84)' }
+      }
+
       coordsOnPage.forEach((coord) => {
         const x1 = toPixels(coord.x1)
         const y1 = toPixels(coord.y1)
@@ -182,10 +234,12 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         const y3 = toPixels(coord.y3) || y2
         const x4 = toPixels(coord.x4) || x1
         const y4 = toPixels(coord.y4) || y1
+        const tone = toneMap[coord.tone]
 
-        annotationContext.fillStyle = 'rgba(249, 115, 22, 0.25)'
-        annotationContext.strokeStyle = 'rgba(249, 115, 22, 0.85)'
-        annotationContext.lineWidth = 2
+        annotationContext.fillStyle = tone.fill
+        annotationContext.strokeStyle = tone.stroke
+        annotationContext.lineWidth = coord.isFocused ? 2.6 : 1.35
+        annotationContext.globalAlpha = coord.isFocused ? 1 : 0.75
 
         annotationContext.beginPath()
         annotationContext.moveTo(x1, y1)
@@ -195,7 +249,21 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         annotationContext.closePath()
         annotationContext.fill()
         annotationContext.stroke()
+
+        if (coord.isFocused && coord.label) {
+          annotationContext.globalAlpha = 1
+          annotationContext.font = '600 11px Segoe UI'
+          const labelWidth = annotationContext.measureText(coord.label).width + 12
+          const labelX = Math.max(4, x1)
+          const labelY = Math.max(16, y1 - 8)
+
+          annotationContext.fillStyle = tone.stroke
+          annotationContext.fillRect(labelX, labelY - 14, labelWidth, 16)
+          annotationContext.fillStyle = '#ffffff'
+          annotationContext.fillText(coord.label, labelX + 6, labelY - 3)
+        }
       })
+      annotationContext.globalAlpha = 1
     }
 
     void renderPage()
@@ -206,6 +274,8 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
     setZoomMode('actual-size')
     setScale(1)
   }
+
+  const visibleMarkingsCount = highlightCoords.filter((coord) => coord.page === currentPage).length
 
   return (
     <div className="pdf-panel">
@@ -295,6 +365,10 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
           <span className="footer-item">
             <i className="fas fa-expand" />
             Scale: {Math.round(scale * 100)}%
+          </span>
+          <span className="footer-item">
+            <i className="fas fa-crosshairs" />
+            Markings: {highlightCoords.length} total · {visibleMarkingsCount} on page
           </span>
         </div>
       </div>
