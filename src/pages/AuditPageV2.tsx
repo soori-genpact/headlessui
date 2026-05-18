@@ -140,12 +140,6 @@ function findFieldValue(fields: Field[], matchers: string[]): string {
   return getResolvedValue(match || {} as Field)
 }
 
-function getDocumentType(fileName: string): string {
-  const label = fileName.replace(/\.[^.]+$/, '')
-  const [first] = label.split(' - ').map((part) => part.trim())
-  return first || label || 'Document'
-}
-
 function sortFields(fields: Field[], sortMode: MappingSort): Field[] {
   if (sortMode === 'field') {
     return [...fields].sort((left, right) => (left.field_name || '').localeCompare(right.field_name || ''))
@@ -156,6 +150,18 @@ function sortFields(fields: Field[], sortMode: MappingSort): Field[] {
     const rightConfidence = parseConfidence(right.confidence_indicator) ?? -1
     return leftConfidence - rightConfidence
   })
+}
+
+function prioritizeSelectedField(fields: Field[], selectedFieldId: string): Field[] {
+  if (!selectedFieldId) return fields
+
+  const selectedIndex = fields.findIndex((field) => field.sys_id === selectedFieldId)
+  if (selectedIndex <= 0) return fields
+
+  const nextFields = [...fields]
+  const [selectedField] = nextFields.splice(selectedIndex, 1)
+  nextFields.unshift(selectedField)
+  return nextFields
 }
 
 function getFirstActionField(fields: Field[]): Field | null {
@@ -191,6 +197,7 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
   const [sectionFilter, setSectionFilter] = useState<SectionFilter | string>('all')
   const [markedOnly, setMarkedOnly] = useState(false)
   const [overrideOnly, setOverrideOnly] = useState(false)
+  const [showAiSummary, setShowAiSummary] = useState(true)
   const { showToast } = useToast()
 
   useEffect(() => {
@@ -336,11 +343,6 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
     }
   }, [fields, submissionNumber])
 
-  const versionLabel = useMemo(() => {
-    const selectedVersion = versions.find((version) => version.sys_id === selectedVersionSysId)
-    return selectedVersion?.label || selectedVersion?.version_display_value || ''
-  }, [selectedVersionSysId, versions])
-
   const documentCounts = useMemo(() => {
     const nextCounts = {
       all: selectedDocumentFields.length,
@@ -395,8 +397,8 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
       ].some((value) => value?.toLowerCase().includes(query))
     })
 
-    return sortFields(nextFields, sortMode)
-  }, [activeTab, markedOnly, mappingSearch, overrideOnly, sectionFilter, selectedDocumentFields, sortMode])
+    return prioritizeSelectedField(sortFields(nextFields, sortMode), selectedFieldId)
+  }, [activeTab, markedOnly, mappingSearch, overrideOnly, sectionFilter, selectedDocumentFields, selectedFieldId, sortMode])
 
   const groupedFields = useMemo(() => {
     const groups = new Map<string, Field[]>()
@@ -452,6 +454,16 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
       setSelectedFieldId(nextField.sys_id)
     }
   }, [fields, selectedDocument, selectedDocumentFields, selectedFieldId])
+
+  useEffect(() => {
+    if (!selectedFieldId) return
+    const node = document.querySelector<HTMLElement>(`[data-field-card-id="${selectedFieldId}"]`)
+    node?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  }, [selectedFieldId, groupedFields.length])
+
+  useEffect(() => {
+    setShowAiSummary(true)
+  }, [selectedDocument])
 
   const handleFieldChange = (fieldId: string, updates: Partial<Field>) => {
     setFields((previousFields) =>
@@ -514,6 +526,16 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
 
     setNavigateSource(field.source)
     setNavigateSeq((previousValue) => previousValue + 1)
+  }
+
+  const handleOverlaySelect = (overlayId: string) => {
+    const field = fields.find((item) => item.sys_id === overlayId)
+    if (!field) return
+
+    setActiveTab('all')
+    setMarkedOnly(false)
+    setOverrideOnly(false)
+    handleNavigateToField(field)
   }
 
   const buildSavePayload = () => ({
@@ -695,10 +717,45 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
             {summary.subBroker && <span>{summary.subBroker}</span>}
             {summary.revenue && <span>{summary.revenue} est. revenue</span>}
             {summary.effectiveDate && <span>Eff. {summary.effectiveDate}</span>}
-            {versionLabel && <span>{versionLabel}</span>}
             {summary.address && <span>{summary.address}</span>}
           </div>
         </div>
+
+        {showAiSummary && (
+          <div className="audit-v2-case-summary">
+            <div className="audit-v2-case-summary-line">
+              <span className="audit-v2-label accent">
+                <i className="fas fa-wand-magic-sparkles" />
+                AI completeness check
+              </span>
+              <strong>{aiSummary.issueCount} issues</strong>
+              <span className="audit-v2-case-summary-text">
+                {selectedDocumentSummary?.name || selectedDocument || 'This document'} has {aiSummary.markings} mapped regions. Review: {aiSummary.detail}
+              </span>
+              <button
+                type="button"
+                className="audit-v2-text-button audit-v2-case-summary-action"
+                onClick={() => showToast('Draft chase flow is not connected in this variant yet.', 'info', 3500)}
+              >
+                Draft chase to broker
+              </button>
+              <button
+                type="button"
+                className="audit-v2-text-button audit-v2-case-summary-action"
+                onClick={() => showToast('AI summary is based on open items for the selected document.', 'info', 2500)}
+              >
+                Why
+              </button>
+              <button
+                type="button"
+                className="audit-v2-text-button audit-v2-case-summary-action"
+                onClick={() => setShowAiSummary(false)}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="audit-v2-case-badges">
           <span className="audit-v2-pill audit-v2-pill-amber">
@@ -741,8 +798,7 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
           <div className="audit-v2-panel audit-v2-left-panel">
             <div className="audit-v2-panel-head">
               <div>
-                <span className="audit-v2-label">Submission</span>
-                <h2>Document queue</h2>
+                <h2>Documents</h2>
               </div>
               <button type="button" className="audit-v2-text-button">
                 + Add
@@ -778,14 +834,10 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                       </span>
                       <div className="audit-v2-doc-title">
                         <strong>{document.name.replace(/\.[^.]+$/, '')}</strong>
-                        <span>{getDocumentType(document.name)} · {document.fields.length} extracted fields</span>
+                        <span>
+                          {document.fields.length} extracted mapping{document.fields.length === 1 ? '' : 's'}
+                        </span>
                       </div>
-                    </div>
-
-                    <div className="audit-v2-doc-meta">
-                      <span>{document.totalMarkings} markings</span>
-                      <span>{document.conflictCount} conflicts</span>
-                      <span>{document.missingCount} missing</span>
                     </div>
 
                     <div className="audit-v2-doc-card-foot">
@@ -820,6 +872,7 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
               navigateSource={navigateSource}
               navigateKey={navigateSeq}
               sourceOverlays={sourceOverlays}
+              onOverlaySelect={handleOverlaySelect}
             />
           </div>
         </main>
@@ -906,31 +959,6 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                 <span>{selectedDocumentFields.length} extracted mappings</span>
                 <span>{overlayFields.length} linked to the document</span>
                 <span>{filteredFields.length} shown after filters</span>
-              </div>
-            </div>
-
-            <div className="audit-v2-ai-card">
-              <div className="audit-v2-ai-card-head">
-                <span className="audit-v2-label accent">
-                  <i className="fas fa-wand-magic-sparkles" />
-                  AI completeness check
-                </span>
-                <strong>{aiSummary.issueCount} issues</strong>
-              </div>
-              <p>
-                {selectedDocument || 'This document'} has {aiSummary.markings} mapped regions on the page layer. Open review items are centered on {aiSummary.detail}
-              </p>
-              <div className="audit-v2-ai-actions">
-                <button
-                  type="button"
-                  className="audit-v2-primary-button small"
-                  onClick={() => showToast('Draft chase flow is not connected in this variant yet.', 'info', 3500)}
-                >
-                  <i className="fas fa-paper-plane" />
-                  Draft chase to broker
-                </button>
-                <button type="button" className="audit-v2-text-button">Why</button>
-                <button type="button" className="audit-v2-text-button">Dismiss</button>
               </div>
             </div>
 
