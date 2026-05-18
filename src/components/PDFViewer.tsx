@@ -14,6 +14,7 @@ interface PDFViewerProps {
   navigateSource?: string
   navigateKey?: number
   sourceOverlays?: PDFSourceOverlay[]
+  onOverlaySelect?: (overlayId: string) => void
 }
 
 interface Coordinate {
@@ -50,10 +51,11 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   token,
   navigateSource,
   navigateKey,
-  sourceOverlays = []
+  sourceOverlays = [],
+  onOverlaySelect
 }) => {
   const [scale, setScale] = useState(1)
-  const [zoomMode, setZoomMode] = useState<'fit-width' | 'actual-size'>('actual-size')
+  const [zoomMode, setZoomMode] = useState<'fit-width' | 'manual' | 'preset-200'>('manual')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -64,6 +66,8 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const annotationCanvasRef = useRef<HTMLCanvasElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const pageTransitionDirectionRef = useRef<'next' | 'prev' | null>(null)
+  const wheelLockRef = useRef(0)
   const { showToast } = useToast()
 
   const parseCoordinateString = (source: string): Coordinate | null => {
@@ -214,6 +218,13 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         viewport
       }).promise
 
+      if (contentRef.current && pageTransitionDirectionRef.current) {
+        contentRef.current.scrollTop = pageTransitionDirectionRef.current === 'next'
+          ? 0
+          : contentRef.current.scrollHeight
+        pageTransitionDirectionRef.current = null
+      }
+
       annotationContext.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height)
       const coordsOnPage = highlightCoords.filter((coord) => coord.page === currentPage)
       const toPixels = (value: number) => value * 72 * scale
@@ -271,40 +282,72 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
 
   const fitWidth = () => setZoomMode('fit-width')
   const actual100Percent = () => {
-    setZoomMode('actual-size')
+    setZoomMode('manual')
     setScale(1)
+  }
+  const actual200Percent = () => {
+    setZoomMode('preset-200')
+    setScale(2)
+  }
+
+  const handleContentWheel: React.WheelEventHandler<HTMLDivElement> = (event) => {
+    if (loading || !pdfDoc || !contentRef.current) return
+
+    const container = contentRef.current
+    const reachedBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 8
+    const reachedTop = container.scrollTop <= 8
+    const now = Date.now()
+
+    if (now - wheelLockRef.current < 240) {
+      return
+    }
+
+    if (event.deltaY > 0 && reachedBottom && currentPage < totalPages) {
+      event.preventDefault()
+      wheelLockRef.current = now
+      pageTransitionDirectionRef.current = 'next'
+      setCurrentPage((page) => Math.min(page + 1, totalPages))
+      return
+    }
+
+    if (event.deltaY < 0 && reachedTop && currentPage > 1) {
+      event.preventDefault()
+      wheelLockRef.current = now
+      pageTransitionDirectionRef.current = 'prev'
+      setCurrentPage((page) => Math.max(page - 1, 1))
+    }
   }
 
   const visibleMarkingsCount = highlightCoords.filter((coord) => coord.page === currentPage).length
+  const overlayButtons = highlightCoords
+    .filter((coord) => coord.page === currentPage)
+    .map((coord, index) => {
+      const pointsX = [coord.x1, coord.x2, coord.x3, coord.x4]
+      const pointsY = [coord.y1, coord.y2, coord.y3, coord.y4]
+      const left = Math.min(...pointsX) * 72 * scale
+      const top = Math.min(...pointsY) * 72 * scale
+      const width = Math.max(...pointsX) * 72 * scale - left
+      const height = Math.max(...pointsY) * 72 * scale - top
+
+      return {
+        key: `${coord.overlayId}-${index}`,
+        overlayId: coord.overlayId,
+        label: coord.label,
+        tone: coord.tone,
+        isFocused: coord.isFocused,
+        style: {
+          left,
+          top,
+          width: Math.max(width, 10),
+          height: Math.max(height, 10)
+        }
+      }
+    })
 
   return (
     <div className="pdf-panel">
       <div className="pdf-header">
-        <div className="pdf-title">
-          <i className="fas fa-file-pdf" />
-          <span>{documentName || 'No document selected'}</span>
-        </div>
-
-        <div className="pdf-controls">
-          <div className="control-group">
-            <button
-              onClick={fitWidth}
-              disabled={loading || !pdfDoc}
-              className={`btn-icon ${zoomMode === 'fit-width' ? 'active' : ''}`}
-              title="Fit to Width"
-            >
-              <i className="fa-solid fa-arrows-left-right-to-line" />
-            </button>
-            <button
-              onClick={actual100Percent}
-              disabled={loading || !pdfDoc}
-              className={`btn-icon ${zoomMode === 'actual-size' ? 'active' : ''}`}
-              title="Actual Size"
-            >
-              <i className="fa-solid fa-text-height" />
-            </button>
-          </div>
-
+        <div className="pdf-header-left">
           <div className="control-group">
             <button
               onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
@@ -314,7 +357,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
             >
               <i className="fas fa-chevron-left" />
             </button>
-            <div className="page-info">Page {currentPage} of {Math.max(totalPages, 0)}</div>
+            <div className="page-info">Page {currentPage} / {Math.max(totalPages, 0)}</div>
             <button
               onClick={() => setCurrentPage((page) => Math.min(page + 1, totalPages))}
               disabled={currentPage >= totalPages || loading}
@@ -325,9 +368,43 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
             </button>
           </div>
         </div>
+
+        <div className="pdf-title">
+          <i className="fas fa-file-pdf" />
+          <span>{documentName || 'No document selected'}</span>
+        </div>
+
+        <div className="pdf-controls">
+          <div className="control-group">
+            <button
+              onClick={fitWidth}
+              disabled={loading || !pdfDoc}
+              className={`btn-zoom ${zoomMode === 'fit-width' ? 'active' : ''}`}
+              title="Fit"
+            >
+              Fit
+            </button>
+            <button
+              onClick={actual100Percent}
+              disabled={loading || !pdfDoc}
+              className={`btn-zoom ${zoomMode === 'manual' && Math.round(scale * 100) === 100 ? 'active' : ''}`}
+              title="100%"
+            >
+              100%
+            </button>
+            <button
+              onClick={actual200Percent}
+              disabled={loading || !pdfDoc}
+              className={`btn-zoom ${zoomMode === 'preset-200' ? 'active' : ''}`}
+              title="200%"
+            >
+              200%
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="pdf-content" ref={contentRef}>
+      <div className="pdf-content" ref={contentRef} onWheel={handleContentWheel}>
         {loading && (
           <div className="pdf-loading-overlay">
             <div className="pdf-loader">
@@ -351,6 +428,18 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
           <div className="pdf-canvas-wrapper">
             <canvas ref={canvasRef} className="pdf-canvas" />
             <canvas ref={annotationCanvasRef} className="annotation-canvas" />
+            <div className="annotation-overlay-layer">
+              {overlayButtons.map((overlay) => (
+                <button
+                  key={overlay.key}
+                  type="button"
+                  title={overlay.label || 'Mapped field'}
+                  className={`annotation-hitbox tone-${overlay.tone} ${overlay.isFocused ? 'is-focused' : ''}`}
+                  style={overlay.style}
+                  onClick={() => onOverlaySelect?.(overlay.overlayId)}
+                />
+              ))}
+            </div>
             <div className="page-marker" />
           </div>
         )}
