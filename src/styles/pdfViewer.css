@@ -239,6 +239,24 @@
   z-index: 100;
 }
 
+.pdf-loading-inline {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(210, 216, 225, 0.95);
+  background: rgba(255, 255, 255, 0.95);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #5f6b7a;
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 90;
+}
+
 .pdf-loader {
   display: flex;
   flex-direction: column;

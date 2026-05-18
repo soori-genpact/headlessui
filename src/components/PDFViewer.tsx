@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext'
 import '../styles/pdfViewer.css'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
+const pdfCache = new Map<string, pdfjsLib.PDFDocumentProxy>()
 
 interface PDFViewerProps {
   attachmentId?: string
@@ -68,6 +69,8 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   const contentRef = useRef<HTMLDivElement>(null)
   const pageTransitionDirectionRef = useRef<'next' | 'prev' | null>(null)
   const wheelLockRef = useRef(0)
+  const requestSeqRef = useRef(0)
+  const pageRenderSeqRef = useRef(0)
   const { showToast } = useToast()
 
   const parseCoordinateString = (source: string): Coordinate | null => {
@@ -107,6 +110,10 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   }
 
   useEffect(() => {
+    const requestSeq = requestSeqRef.current + 1
+    requestSeqRef.current = requestSeq
+    const controller = new AbortController()
+
     const loadPDF = async () => {
       if (!attachmentId || !baseUrl || !token) {
         setPdfDoc(null)
@@ -120,11 +127,27 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         setLoading(true)
         setError('')
 
+        const cacheKey = `${baseUrl}::${attachmentId}`
+        const cachedPdf = pdfCache.get(cacheKey)
+
+        if (cachedPdf) {
+          const firstPage = await cachedPdf.getPage(1)
+          const viewport = firstPage.getViewport({ scale: 1 })
+          if (requestSeq !== requestSeqRef.current) return
+          setPdfDoc(cachedPdf)
+          setTotalPages(cachedPdf.numPages)
+          setCurrentPage(1)
+          setPageSize({ width: viewport.width, height: viewport.height })
+          setLoading(false)
+          return
+        }
+
         const url = `${baseUrl}/api/x_gegis_uwm_dashbo/v1/auditpageapi/attachment/${attachmentId}?format=binary`
         const response = await fetch(url, {
           headers: {
             Authorization: `Bearer ${token}`
-          }
+          },
+          signal: controller.signal
         })
 
         if (!response.ok) {
@@ -136,21 +159,33 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         const firstPage = await pdf.getPage(1)
         const viewport = firstPage.getViewport({ scale: 1 })
 
+        if (requestSeq !== requestSeqRef.current) return
+        pdfCache.set(cacheKey, pdf)
         setPdfDoc(pdf)
         setTotalPages(pdf.numPages)
         setCurrentPage(1)
         setPageSize({ width: viewport.width, height: viewport.height })
         showToast(`Loaded ${pdf.numPages} pages`, 'success', 2500)
       } catch (err) {
+        if (controller.signal.aborted) {
+          return
+        }
+        if (requestSeq !== requestSeqRef.current) return
         const message = err instanceof Error ? err.message : 'Failed to load PDF'
         setError(message)
         showToast(`PDF Error: ${message}`, 'error', 5000)
       } finally {
-        setLoading(false)
+        if (requestSeq === requestSeqRef.current) {
+          setLoading(false)
+        }
       }
     }
 
     void loadPDF()
+
+    return () => {
+      controller.abort()
+    }
   }, [attachmentId, baseUrl, token, showToast])
 
   useEffect(() => {
@@ -193,17 +228,20 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   }, [navigateKey, navigateSource])
 
   useEffect(() => {
+    const renderSeq = pageRenderSeqRef.current + 1
+    pageRenderSeqRef.current = renderSeq
+
     const renderPage = async () => {
       if (!pdfDoc || !canvasRef.current || !annotationCanvasRef.current) return
 
       const page = await pdfDoc.getPage(currentPage)
+      if (renderSeq !== pageRenderSeqRef.current) return
       const viewport = page.getViewport({ scale })
       const canvas = canvasRef.current
       const annotationCanvas = annotationCanvasRef.current
       const context = canvas.getContext('2d')
-      const annotationContext = annotationCanvas.getContext('2d')
 
-      if (!context || !annotationContext) return
+      if (!context) return
 
       canvas.width = viewport.width
       canvas.height = viewport.height
@@ -211,10 +249,20 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
       annotationCanvas.height = viewport.height
       setPageSize({ width: Math.round(viewport.width), height: Math.round(viewport.height) })
 
-      await page.render({
+      const renderTask = page.render({
         canvasContext: context,
         viewport
-      }).promise
+      })
+
+      try {
+        await renderTask.promise
+      } catch (error) {
+        const typedError = error as { name?: string }
+        if (typedError?.name === 'RenderingCancelledException') return
+        throw error
+      }
+
+      if (renderSeq !== pageRenderSeqRef.current) return
 
       if (contentRef.current && pageTransitionDirectionRef.current) {
         contentRef.current.scrollTop = pageTransitionDirectionRef.current === 'next'
@@ -222,61 +270,80 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
           : contentRef.current.scrollHeight
         pageTransitionDirectionRef.current = null
       }
-
-      annotationContext.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height)
-      const coordsOnPage = highlightCoords.filter((coord) => coord.page === currentPage)
-      const toPixels = (value: number) => value * 72 * scale
-
-      const toneMap: Record<OverlayCoordinate['tone'], { fill: string; stroke: string }> = {
-        validated: { fill: 'rgba(22, 155, 98, 0.16)', stroke: 'rgba(22, 155, 98, 0.92)' },
-        review: { fill: 'rgba(217, 119, 6, 0.15)', stroke: 'rgba(217, 119, 6, 0.9)' },
-        conflict: { fill: 'rgba(225, 29, 72, 0.16)', stroke: 'rgba(225, 29, 72, 0.92)' },
-        missing: { fill: 'rgba(95, 107, 122, 0.14)', stroke: 'rgba(95, 107, 122, 0.84)' }
-      }
-
-      coordsOnPage.forEach((coord) => {
-        const x1 = toPixels(coord.x1)
-        const y1 = toPixels(coord.y1)
-        const x2 = toPixels(coord.x2)
-        const y2 = toPixels(coord.y2)
-        const x3 = toPixels(coord.x3) || x2
-        const y3 = toPixels(coord.y3) || y2
-        const x4 = toPixels(coord.x4) || x1
-        const y4 = toPixels(coord.y4) || y1
-        const tone = toneMap[coord.tone]
-
-        annotationContext.fillStyle = tone.fill
-        annotationContext.strokeStyle = tone.stroke
-        annotationContext.lineWidth = coord.isFocused ? 2.6 : 1.35
-        annotationContext.globalAlpha = coord.isFocused ? 1 : 0.75
-
-        annotationContext.beginPath()
-        annotationContext.moveTo(x1, y1)
-        annotationContext.lineTo(x2, y2)
-        annotationContext.lineTo(x3, y3)
-        annotationContext.lineTo(x4, y4)
-        annotationContext.closePath()
-        annotationContext.fill()
-        annotationContext.stroke()
-
-        if (coord.isFocused && coord.label) {
-          annotationContext.globalAlpha = 1
-          annotationContext.font = '600 11px Segoe UI'
-          const labelWidth = annotationContext.measureText(coord.label).width + 12
-          const labelX = Math.max(4, x1)
-          const labelY = Math.max(16, y1 - 8)
-
-          annotationContext.fillStyle = tone.stroke
-          annotationContext.fillRect(labelX, labelY - 14, labelWidth, 16)
-          annotationContext.fillStyle = '#ffffff'
-          annotationContext.fillText(coord.label, labelX + 6, labelY - 3)
-        }
-      })
-      annotationContext.globalAlpha = 1
     }
 
     void renderPage()
-  }, [pdfDoc, currentPage, scale, highlightCoords])
+
+    return () => {
+      pageRenderSeqRef.current += 1
+    }
+  }, [pdfDoc, currentPage, scale])
+
+  useEffect(() => {
+    if (!annotationCanvasRef.current || !canvasRef.current) return
+
+    const annotationCanvas = annotationCanvasRef.current
+    const canvas = canvasRef.current
+    const annotationContext = annotationCanvas.getContext('2d')
+
+    if (!annotationContext) return
+
+    if (annotationCanvas.width !== canvas.width || annotationCanvas.height !== canvas.height) {
+      annotationCanvas.width = canvas.width
+      annotationCanvas.height = canvas.height
+    }
+
+    annotationContext.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height)
+    const coordsOnPage = highlightCoords.filter((coord) => coord.page === currentPage)
+    const toPixels = (value: number) => value * 72 * scale
+
+    const toneMap: Record<OverlayCoordinate['tone'], { fill: string; stroke: string }> = {
+      validated: { fill: 'rgba(22, 155, 98, 0.16)', stroke: 'rgba(22, 155, 98, 0.92)' },
+      review: { fill: 'rgba(217, 119, 6, 0.15)', stroke: 'rgba(217, 119, 6, 0.9)' },
+      conflict: { fill: 'rgba(225, 29, 72, 0.16)', stroke: 'rgba(225, 29, 72, 0.92)' },
+      missing: { fill: 'rgba(95, 107, 122, 0.14)', stroke: 'rgba(95, 107, 122, 0.84)' }
+    }
+
+    coordsOnPage.forEach((coord) => {
+      const x1 = toPixels(coord.x1)
+      const y1 = toPixels(coord.y1)
+      const x2 = toPixels(coord.x2)
+      const y2 = toPixels(coord.y2)
+      const x3 = toPixels(coord.x3) || x2
+      const y3 = toPixels(coord.y3) || y2
+      const x4 = toPixels(coord.x4) || x1
+      const y4 = toPixels(coord.y4) || y1
+      const tone = toneMap[coord.tone]
+
+      annotationContext.fillStyle = tone.fill
+      annotationContext.strokeStyle = tone.stroke
+      annotationContext.lineWidth = coord.isFocused ? 2.6 : 1.35
+      annotationContext.globalAlpha = coord.isFocused ? 1 : 0.75
+
+      annotationContext.beginPath()
+      annotationContext.moveTo(x1, y1)
+      annotationContext.lineTo(x2, y2)
+      annotationContext.lineTo(x3, y3)
+      annotationContext.lineTo(x4, y4)
+      annotationContext.closePath()
+      annotationContext.fill()
+      annotationContext.stroke()
+
+      if (coord.isFocused && coord.label) {
+        annotationContext.globalAlpha = 1
+        annotationContext.font = '600 11px Segoe UI'
+        const labelWidth = annotationContext.measureText(coord.label).width + 12
+        const labelX = Math.max(4, x1)
+        const labelY = Math.max(16, y1 - 8)
+
+        annotationContext.fillStyle = tone.stroke
+        annotationContext.fillRect(labelX, labelY - 14, labelWidth, 16)
+        annotationContext.fillStyle = '#ffffff'
+        annotationContext.fillText(coord.label, labelX + 6, labelY - 3)
+      }
+    })
+    annotationContext.globalAlpha = 1
+  }, [currentPage, highlightCoords, scale])
 
   const fitWidth = () => setZoomMode('fit-width')
   const actual100Percent = () => {
@@ -403,12 +470,19 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
       </div>
 
       <div className="pdf-content" ref={contentRef} onWheel={handleContentWheel}>
-        {loading && (
+        {loading && !pdfDoc && (
           <div className="pdf-loading-overlay">
             <div className="pdf-loader">
               <i className="fas fa-spinner fa-spin" />
               <span>Loading PDF...</span>
             </div>
+          </div>
+        )}
+
+        {loading && !!pdfDoc && (
+          <div className="pdf-loading-inline">
+            <i className="fas fa-spinner fa-spin" />
+            <span>Updating document...</span>
           </div>
         )}
 
