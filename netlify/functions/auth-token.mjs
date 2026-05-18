@@ -17,9 +17,27 @@ export async function handler(request) {
       clientSecret: inputClientSecret
     } = payload
 
-    const baseUrl = (inputBaseUrl || process.env.SNOW_BASE_URL || '').trim()
-    const clientId = (inputClientId || process.env.SNOW_CLIENT_ID || '').trim()
-    const clientSecret = (inputClientSecret || process.env.SNOW_CLIENT_SECRET || '').trim()
+    const baseUrl = (
+      inputBaseUrl ||
+      process.env.SNOW_BASE_URL ||
+      process.env.VITE_SNOW_BASE_URL ||
+      process.env.SERVICENOW_BASE_URL ||
+      ''
+    ).trim()
+    const clientId = (
+      inputClientId ||
+      process.env.SNOW_CLIENT_ID ||
+      process.env.VITE_SNOW_CLIENT_ID ||
+      process.env.SERVICENOW_CLIENT_ID ||
+      ''
+    ).trim()
+    const clientSecret = (
+      inputClientSecret ||
+      process.env.SNOW_CLIENT_SECRET ||
+      process.env.VITE_SNOW_CLIENT_SECRET ||
+      process.env.SERVICENOW_CLIENT_SECRET ||
+      ''
+    ).trim()
 
     if (!baseUrl || !clientId || !clientSecret) {
       return {
@@ -28,7 +46,7 @@ export async function handler(request) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          error: 'Netlify auth configuration is incomplete. Set SNOW_BASE_URL, SNOW_CLIENT_ID, SNOW_CLIENT_SECRET.'
+          error: 'Netlify auth configuration is incomplete. Set SNOW_CLIENT_ID/SNOW_CLIENT_SECRET/SNOW_BASE_URL (or VITE_/SERVICENOW_ variants).'
         })
       }
     }
