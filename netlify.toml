@@ -3,6 +3,9 @@
   publish = "dist"
   functions = "netlify/functions"
 
+[build.environment]
+  NPM_FLAGS = "--include=dev"
+
 [[redirects]]
   from = "/api/auth/token"
   to = "/.netlify/functions/auth-token"
@@ -12,9 +15,3 @@
   from = "/*"
   to = "/index.html"
   status = 200
-
-[context.production.environment]
-  NODE_ENV = "production"
-
-[context.development.environment]
-  NODE_ENV = "development"
