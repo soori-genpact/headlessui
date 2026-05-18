@@ -796,7 +796,7 @@
 }
 
 .audit-v2-field-card {
-  padding: 12px;
+  padding: 8px 10px;
   border-radius: 14px;
   border: 1px solid var(--audit-v2-border);
   border-left-width: 4px;
@@ -824,12 +824,51 @@
   border-left-color: var(--audit-v2-zinc);
 }
 
-.audit-v2-field-meta {
-  margin-top: 6px;
+.audit-v2-field-compact-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.audit-v2-field-compact-main {
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.audit-v2-field-compact-name {
+  flex: 0 0 auto;
+  max-width: 44%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--audit-v2-subtle);
+}
+
+.audit-v2-field-compact-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--audit-v2-text);
+}
+
+.audit-v2-field-compact-value.is-empty {
+  color: var(--audit-v2-subtle);
+  font-style: italic;
+}
+
+.audit-v2-field-compact-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .audit-v2-confidence {
@@ -928,8 +967,17 @@
   color: var(--audit-v2-subtle);
 }
 
-.audit-v2-value-block {
-  margin-top: 10px;
+.audit-v2-field-expanded {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(216, 222, 232, 0.8);
+}
+
+.audit-v2-field-expanded-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 .audit-v2-extracted-value {
@@ -959,6 +1007,13 @@
   font-size: 14px;
   color: var(--audit-v2-text);
   background: rgba(247, 248, 255, 0.7);
+}
+
+.audit-v2-field-input.compact {
+  min-height: 34px;
+  margin-top: 0;
+  padding: 0 10px;
+  font-size: 13px;
 }
 
 .audit-v2-field-textarea {
@@ -991,6 +1046,25 @@
 
 .audit-v2-field-actions {
   margin-top: 10px;
+}
+
+.audit-v2-field-actions.compact {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.audit-v2-field-actions.compact .audit-v2-accept-button,
+.audit-v2-field-actions.compact .audit-v2-outline-button.small {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.audit-v2-field-override-row {
+  margin-top: 6px;
 }
 
 .audit-v2-accept-button {

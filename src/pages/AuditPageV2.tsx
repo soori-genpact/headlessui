@@ -126,6 +126,10 @@ function formatConfidence(value?: string): string {
   return `${Math.round(confidence * 100)}`
 }
 
+function hasConflictMarker(commentary?: string): boolean {
+  return /\[qa-conflict\]/i.test(commentary || '')
+}
+
 function getOverlayTone(field: Field): PDFSourceOverlay['tone'] {
   const state = deriveFieldState(field)
   if (state === 'validated') return 'validated'
@@ -197,6 +201,7 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
   const [sectionFilter, setSectionFilter] = useState<SectionFilter | string>('all')
   const [markedOnly, setMarkedOnly] = useState(false)
   const [overrideOnly, setOverrideOnly] = useState(false)
+  const [overrideEditorFieldId, setOverrideEditorFieldId] = useState('')
   const [showAiSummary, setShowAiSummary] = useState(true)
   const { showToast } = useToast()
 
@@ -481,12 +486,25 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
     })
   }
 
+  const handleToggleConflict = (field: Field) => {
+    const commentary = (field.commentary || '').trim()
+    const flagged = hasConflictMarker(commentary)
+    const nextCommentary = flagged
+      ? commentary.replace(/\s*\[qa-conflict\]\s*/ig, ' ').replace(/\s{2,}/g, ' ').trim()
+      : `${commentary ? `${commentary} ` : ''}[qa-conflict]`
+
+    handleFieldChange(field.sys_id, {
+      commentary: nextCommentary
+    })
+  }
+
   const handleSelectDocument = (documentName: string) => {
     setSelectedDocument(documentName)
     setSectionFilter('all')
     setMappingSearch('')
     setMarkedOnly(false)
     setOverrideOnly(false)
+    setOverrideEditorFieldId('')
 
     const targetField = fields.find((field) => field.attachmentData?.file_name === documentName)
     if (targetField?.attachmentData?.sys_id) {
@@ -975,6 +993,8 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                       const resolvedValue = getResolvedValue(field)
                       const extractedValue = field.field_value?.trim() || ''
                       const isSelected = selectedField?.sys_id === field.sys_id
+                      const showOverrideEditor = isSelected && overrideEditorFieldId === field.sys_id
+                      const isConflictFlagged = hasConflictMarker(field.commentary)
                       const confidenceTone = getConfidenceTone(field.confidence_indicator)
                       const confidenceClass = confidenceTone === 'high'
                         ? 'is-high'
@@ -990,111 +1010,88 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                         <article
                           key={field.sys_id}
                           className={`audit-v2-field-card ${getFieldAccentClass(field)} ${isSelected ? 'is-selected' : ''}`}
+                          data-field-card-id={field.sys_id}
                           onClick={() => handleNavigateToField(field)}
                         >
-                          <div className="audit-v2-field-card-head">
-                            <div>
-                              <span className="audit-v2-label">{field.field_name || 'Unnamed field'}</span>
-                              <div className="audit-v2-field-meta">
-                                <span className={`audit-v2-confidence ${confidenceClass}`}>
-                                  <span className="audit-v2-confidence-bar"><i style={{ width: `${formatConfidence(field.confidence_indicator)}%` }} /></span>
-                                  {formatConfidence(field.confidence_indicator)}
-                                </span>
-                                <span className={`audit-v2-status-tag ${getFieldAccentClass(field)}`}>
-                                  {getFieldStateLabel(field)}
-                                </span>
-                                {pageNumber && (
-                                  <span className="audit-v2-mini-tag">
-                                    page {pageNumber}
-                                  </span>
-                                )}
-                                {!!markingCount && (
-                                  <span className="audit-v2-mini-tag">
-                                    {markingCount} mark{markingCount > 1 ? 's' : ''}
-                                  </span>
-                                )}
+                          <div className="audit-v2-field-compact-row">
+                            <div className="audit-v2-field-compact-main">
+                              <span className="audit-v2-field-compact-name">{field.field_name || 'Unnamed field'}</span>
+                              <span className={`audit-v2-field-compact-value ${(resolvedValue || extractedValue) ? '' : 'is-empty'}`}>
+                                {resolvedValue || extractedValue || 'No extracted value'}
+                              </span>
+                            </div>
+
+                            <div className="audit-v2-field-compact-right">
+                              <span className={`audit-v2-confidence ${confidenceClass}`}>
+                                <span className="audit-v2-confidence-bar"><i style={{ width: `${formatConfidence(field.confidence_indicator)}%` }} /></span>
+                                {formatConfidence(field.confidence_indicator)}
+                              </span>
+                              <span className={`audit-v2-status-tag ${getFieldAccentClass(field)}`}>
+                                {getFieldStateLabel(field)}
+                              </span>
+                            </div>
+                          </div>
+
+                          {isSelected && (
+                            <div className="audit-v2-field-expanded">
+                              <div className="audit-v2-field-expanded-meta">
+                                {pageNumber && <span className="audit-v2-mini-tag">page {pageNumber}</span>}
+                                {!!markingCount && <span className="audit-v2-mini-tag">{markingCount} mark{markingCount > 1 ? 's' : ''}</span>}
                               </div>
+
+                              <div className="audit-v2-field-actions compact">
+                                <button
+                                  type="button"
+                                  className="audit-v2-accept-button"
+                                  onClick={(event) => {
+                                    event.stopPropagation()
+                                    handleAcceptField(field)
+                                  }}
+                                  disabled={saving || completing || isReadOnlyVersion}
+                                >
+                                  <i className="fas fa-check" />
+                                  Accept
+                                </button>
+                                <button
+                                  type="button"
+                                  className="audit-v2-outline-button small"
+                                  onClick={(event) => {
+                                    event.stopPropagation()
+                                    handleToggleConflict(field)
+                                  }}
+                                  disabled={saving || completing || isReadOnlyVersion}
+                                >
+                                  <i className="fas fa-triangle-exclamation" />
+                                  {isConflictFlagged ? 'Clear' : 'Conflict'}
+                                </button>
+                                <button
+                                  type="button"
+                                  className={`audit-v2-outline-button small ${showOverrideEditor ? 'is-active' : ''}`}
+                                  onClick={(event) => {
+                                    event.stopPropagation()
+                                    setOverrideEditorFieldId((currentValue) => currentValue === field.sys_id ? '' : field.sys_id)
+                                  }}
+                                  disabled={saving || completing || isReadOnlyVersion}
+                                >
+                                  <i className="fas fa-pen" />
+                                  Override
+                                </button>
+                              </div>
+
+                              {showOverrideEditor && (
+                                <div className="audit-v2-field-override-row">
+                                  <input
+                                    value={field.qa_override_value || ''}
+                                    onChange={(event) => handleOverrideChange(field, event.target.value)}
+                                    onClick={(event) => event.stopPropagation()}
+                                    disabled={saving || completing || isReadOnlyVersion}
+                                    className="audit-v2-field-input compact"
+                                    placeholder={extractedValue || 'Add override'}
+                                  />
+                                </div>
+                              )}
                             </div>
-
-                            {field.source && (
-                              <button
-                                type="button"
-                                className="audit-v2-icon-button"
-                                onClick={(event) => {
-                                  event.stopPropagation()
-                                  handleNavigateToField(field)
-                                }}
-                                title="Go to source"
-                              >
-                                <i className="fas fa-crosshairs" />
-                              </button>
-                            )}
-                          </div>
-
-                          <div className="audit-v2-value-block">
-                            <span className="audit-v2-label">Extracted value</span>
-                            <div className={`audit-v2-extracted-value ${extractedValue ? '' : 'is-empty'}`}>
-                              {extractedValue || 'No extracted value'}
-                            </div>
-                          </div>
-
-                          <div className="audit-v2-value-block">
-                            <span className="audit-v2-label">Override value</span>
-                            <input
-                              value={field.qa_override_value || ''}
-                              onChange={(event) => handleOverrideChange(field, event.target.value)}
-                              onClick={(event) => event.stopPropagation()}
-                              disabled={saving || completing || isReadOnlyVersion}
-                              className="audit-v2-field-input"
-                              placeholder={extractedValue || 'Add override'}
-                            />
-                          </div>
-
-                          <div className="audit-v2-field-source-line">
-                            <span>
-                              Current decision: {resolvedValue || 'Not reviewed yet'}
-                            </span>
-                            {field.logic_transparency && (
-                              <span className="audit-v2-field-subline">{field.logic_transparency}</span>
-                            )}
-                          </div>
-
-                          <div className="audit-v2-field-actions">
-                            <button
-                              type="button"
-                              className="audit-v2-accept-button"
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                handleAcceptField(field)
-                              }}
-                              disabled={saving || completing || isReadOnlyVersion}
-                            >
-                              <i className="fas fa-check" />
-                              Accept extracted
-                            </button>
-                            <button
-                              type="button"
-                              className="audit-v2-text-button"
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                handleNavigateToField(field)
-                              }}
-                            >
-                              Link to document
-                            </button>
-                            {!!field.qa_override_value && (
-                              <button
-                                type="button"
-                                className="audit-v2-text-button"
-                                onClick={(event) => {
-                                  event.stopPropagation()
-                                  handleOverrideChange(field, '')
-                                }}
-                              >
-                                Clear override
-                              </button>
-                            )}
-                          </div>
+                          )}
                         </article>
                       )
                     })}
