@@ -3,7 +3,7 @@ import { useToast } from '../context/ToastContext'
 import '../styles/toast.css'
 
 export const ToastContainer: React.FC = () => {
-  const { toasts } = useToast()
+  const { toasts, dismissToast } = useToast()
 
   return (
     <div className="toast-container">
@@ -21,6 +21,14 @@ export const ToastContainer: React.FC = () => {
             {toast.type === 'warning' && <i className="fas fa-warning toast-icon" />}
             <span className="toast-message">{toast.message}</span>
           </div>
+          <button
+            type="button"
+            className="toast-close"
+            aria-label="Dismiss notification"
+            onClick={() => dismissToast(toast.id)}
+          >
+            <i className="fas fa-times" />
+          </button>
         </div>
       ))}
     </div>
