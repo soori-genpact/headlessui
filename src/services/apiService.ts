@@ -11,6 +11,7 @@ export interface Field {
   confidence_indicator?: string
   logic_transparency?: string
   section_name?: string
+  source?: string
   attachmentData?: {
     sys_id?: string
     file_name: string

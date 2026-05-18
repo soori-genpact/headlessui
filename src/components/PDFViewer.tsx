@@ -11,13 +11,29 @@ interface PDFViewerProps {
   documentName?: string
   baseUrl?: string
   token?: string
+  navigateSource?: string
+  navigateKey?: number
+}
+
+interface Coordinate {
+  page: number
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+  x3: number
+  y3: number
+  x4: number
+  y4: number
 }
 
 export const PDFViewer: React.FC<PDFViewerProps> = ({
   attachmentId,
   documentName = 'Document',
   baseUrl,
-  token
+  token,
+  navigateSource,
+  navigateKey
 }) => {
   const [scale, setScale] = useState(1)
   const [zoomMode, setZoomMode] = useState<'fit-width' | 'actual-size'>('actual-size')
@@ -27,9 +43,35 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null)
   const [error, setError] = useState('')
   const [pageSize, setPageSize] = useState<{ width: number; height: number } | null>(null)
+  const [highlightCoords, setHighlightCoords] = useState<Coordinate[]>([])
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const annotationCanvasRef = useRef<HTMLCanvasElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const { showToast } = useToast()
+
+  const parseCoordinateString = (source: string): Coordinate | null => {
+    const match = source.match(/D\((\d+),([\d.]+),([\d.]+),([\d.]+),([\d.]+),([\d.]+),([\d.]+),([\d.]+),([\d.]+)\)/)
+    if (!match) return null
+    return {
+      page: Number.parseInt(match[1], 10),
+      x1: Number.parseFloat(match[2]),
+      y1: Number.parseFloat(match[3]),
+      x2: Number.parseFloat(match[4]),
+      y2: Number.parseFloat(match[5]),
+      x3: Number.parseFloat(match[6]),
+      y3: Number.parseFloat(match[7]),
+      x4: Number.parseFloat(match[8]),
+      y4: Number.parseFloat(match[9])
+    }
+  }
+
+  const parseMultipleCoordinateStrings = (source?: string): Coordinate[] => {
+    if (!source || typeof source !== 'string') return []
+    return source
+      .split(';')
+      .map((item) => parseCoordinateString(item.trim()))
+      .filter((item): item is Coordinate => Boolean(item))
+  }
 
   useEffect(() => {
     const loadPDF = async () => {
@@ -37,6 +79,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         setPdfDoc(null)
         setTotalPages(0)
         setError('')
+        setHighlightCoords([])
         return
       }
 
@@ -44,6 +87,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         setLoading(true)
         setError('')
         setPdfDoc(null)
+        setHighlightCoords([])
 
         const url = `${baseUrl}/api/x_gegis_uwm_dashbo/v1/auditpageapi/attachment/${attachmentId}?format=binary`
         const response = await fetch(url, {
@@ -91,28 +135,71 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   }, [pdfDoc, currentPage, zoomMode])
 
   useEffect(() => {
+    if (!navigateKey) return
+    const parsed = parseMultipleCoordinateStrings(navigateSource)
+    if (!parsed.length) return
+    setHighlightCoords(parsed)
+    const firstPage = parsed[0].page
+    if (firstPage > 0) {
+      setCurrentPage(firstPage)
+    }
+  }, [navigateKey, navigateSource])
+
+  useEffect(() => {
     const renderPage = async () => {
-      if (!pdfDoc || !canvasRef.current) return
+      if (!pdfDoc || !canvasRef.current || !annotationCanvasRef.current) return
 
       const page = await pdfDoc.getPage(currentPage)
       const viewport = page.getViewport({ scale })
       const canvas = canvasRef.current
+      const annotationCanvas = annotationCanvasRef.current
       const context = canvas.getContext('2d')
+      const annotationContext = annotationCanvas.getContext('2d')
 
-      if (!context) return
+      if (!context || !annotationContext) return
 
       canvas.width = viewport.width
       canvas.height = viewport.height
+      annotationCanvas.width = viewport.width
+      annotationCanvas.height = viewport.height
       setPageSize({ width: Math.round(viewport.width), height: Math.round(viewport.height) })
 
       await page.render({
         canvasContext: context,
         viewport
       }).promise
+
+      annotationContext.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height)
+      const coordsOnPage = highlightCoords.filter((coord) => coord.page === currentPage)
+      const toPixels = (value: number) => value * 72 * scale
+
+      coordsOnPage.forEach((coord) => {
+        const x1 = toPixels(coord.x1)
+        const y1 = toPixels(coord.y1)
+        const x2 = toPixels(coord.x2)
+        const y2 = toPixels(coord.y2)
+        const x3 = toPixels(coord.x3) || x2
+        const y3 = toPixels(coord.y3) || y2
+        const x4 = toPixels(coord.x4) || x1
+        const y4 = toPixels(coord.y4) || y1
+
+        annotationContext.fillStyle = 'rgba(249, 115, 22, 0.25)'
+        annotationContext.strokeStyle = 'rgba(249, 115, 22, 0.85)'
+        annotationContext.lineWidth = 2
+
+        annotationContext.beginPath()
+        annotationContext.moveTo(x1, y1)
+        annotationContext.lineTo(x2, y2)
+        annotationContext.lineTo(x3, y3)
+        annotationContext.lineTo(x4, y4)
+        annotationContext.closePath()
+        annotationContext.fill()
+        annotationContext.stroke()
+      })
     }
 
     void renderPage()
-  }, [pdfDoc, currentPage, scale])
+  }, [pdfDoc, currentPage, scale, highlightCoords])
 
   const fitWidth = () => setZoomMode('fit-width')
   const actual100Percent = () => {
@@ -193,7 +280,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         {!loading && !error && !!pdfDoc && (
           <div className="pdf-canvas-wrapper">
             <canvas ref={canvasRef} className="pdf-canvas" />
-            <canvas className="annotation-canvas" />
+            <canvas ref={annotationCanvasRef} className="annotation-canvas" />
             <div className="page-marker" />
           </div>
         )}

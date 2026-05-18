@@ -35,6 +35,8 @@ export const AuditPage: React.FC<AuditPageProps> = ({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterDocumentOnly, setFilterDocumentOnly] = useState(false)
+  const [navigateSource, setNavigateSource] = useState<string>('')
+  const [navigateSeq, setNavigateSeq] = useState(0)
   const { showToast } = useToast()
 
   // Load initial data
@@ -149,6 +151,23 @@ export const AuditPage: React.FC<AuditPageProps> = ({
     showToast(`Switched to version: ${selectedVer?.version_display_value || 'Unknown'}`, 'info', 3000)
   }
 
+  const handleNavigateToField = (field: Field) => {
+    if (!field.source || !field.attachmentData?.sys_id) {
+      return
+    }
+
+    if (field.attachmentData.file_name && field.attachmentData.file_name !== selectedDocument) {
+      setSelectedDocument(field.attachmentData.file_name)
+    }
+
+    if (field.attachmentData.sys_id !== selectedAttachmentId) {
+      setSelectedAttachmentId(field.attachmentData.sys_id)
+    }
+
+    setNavigateSource(field.source)
+    setNavigateSeq((prev) => prev + 1)
+  }
+
   const handleComplete = async () => {
     try {
       setIsCompleting(true)
@@ -220,6 +239,7 @@ export const AuditPage: React.FC<AuditPageProps> = ({
           onVersionChange={handleVersionChange}
           onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
           onFieldChange={handleFieldChange}
+          onNavigateToField={handleNavigateToField}
           selectedDocument={selectedDocument}
           onSelectDocument={handleSelectDocument}
           searchQuery={searchQuery}
@@ -236,6 +256,8 @@ export const AuditPage: React.FC<AuditPageProps> = ({
           documentName={selectedDocument || 'No document selected'}
           baseUrl={authService.getConfig()?.baseUrl}
           token={authService.getToken()?.access_token}
+          navigateSource={navigateSource}
+          navigateKey={navigateSeq}
         />
       </div>
     </div>

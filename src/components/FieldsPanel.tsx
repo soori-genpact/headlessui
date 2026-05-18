@@ -21,6 +21,7 @@ interface FieldsPanelProps {
   onVersionChange?: (versionId: string) => void
   onToggleSidebar: () => void
   onFieldChange: (fieldId: string, updates: Partial<Field>) => void
+  onNavigateToField?: (field: Field) => void
   selectedDocument: string
   onSelectDocument: (doc: string) => void
   searchQuery: string
@@ -75,6 +76,7 @@ export const FieldsPanel: React.FC<FieldsPanelProps> = ({
   onVersionChange,
   onToggleSidebar,
   onFieldChange,
+  onNavigateToField,
   selectedDocument,
   onSelectDocument,
   searchQuery,
@@ -133,6 +135,8 @@ export const FieldsPanel: React.FC<FieldsPanelProps> = ({
   const canEditDataVerification = !isReadOnlyVersion && dataVerificationEditStatuses.includes(submissionStatus || '')
   const canEditQaOverride = !isReadOnlyVersion && qaOverrideEditStatuses.includes(submissionStatus || '')
   const canEditCommentary = canEditDataVerification || canEditQaOverride
+  const canNavigate = (field: Field): boolean =>
+    Boolean(field.attachmentData?.sys_id && field.source && field.source.trim().length > 0)
 
   const completeButtonClass = isComplete
     ? 'btn-complete btn-complete-done'
@@ -308,13 +312,18 @@ export const FieldsPanel: React.FC<FieldsPanelProps> = ({
                         {sectionFields.map((field) => {
                           const confidenceClass = getConfidenceClass(field.confidence_indicator)
                           return (
-                            <tr key={field.sys_id} className={!field.attachmentData?.sys_id ? 'no-navigate' : ''}>
+                            <tr key={field.sys_id} className={!canNavigate(field) ? 'no-navigate' : ''}>
                               <td className="col-field-name">
                                 <div className="field-name-cell">
-                                  {!!(field as Field & { source?: unknown }).source && (
+                                  {!!field.source && (
                                     <i className="fas fa-crosshairs source-indicator" title="Has source coordinates" />
                                   )}
-                                  <span className="field-name" title={field.field_name}>
+                                  <span
+                                    className="field-name"
+                                    title={field.field_name}
+                                    onClick={() => canNavigate(field) && onNavigateToField?.(field)}
+                                    style={{ cursor: canNavigate(field) ? 'pointer' : 'default' }}
+                                  >
                                     {field.field_name || '-'}
                                   </span>
                                   {confidenceClass && field.confidence_indicator && (
