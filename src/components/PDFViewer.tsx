@@ -60,6 +60,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [isPanMode, setIsPanMode] = useState(false)
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null)
   const [error, setError] = useState('')
   const [pageSize, setPageSize] = useState<{ width: number; height: number } | null>(null)
@@ -71,6 +72,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   const wheelLockRef = useRef(0)
   const requestSeqRef = useRef(0)
   const pageRenderSeqRef = useRef(0)
+  const panSessionRef = useRef<{ startX: number; startY: number; scrollLeft: number; scrollTop: number } | null>(null)
   const { showToast } = useToast()
 
   const parseCoordinateString = (source: string): Coordinate | null => {
@@ -354,6 +356,14 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
     setZoomMode('preset-200')
     setScale(2)
   }
+  const zoomOut = () => {
+    setZoomMode('manual')
+    setScale((currentValue) => Math.max(0.5, Number((currentValue - 0.1).toFixed(2))))
+  }
+  const zoomIn = () => {
+    setZoomMode('manual')
+    setScale((currentValue) => Math.min(3, Number((currentValue + 0.1).toFixed(2))))
+  }
 
   const handleContentWheel: React.WheelEventHandler<HTMLDivElement> = (event) => {
     if (loading || !pdfDoc || !contentRef.current) return
@@ -381,6 +391,31 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
       pageTransitionDirectionRef.current = 'prev'
       setCurrentPage((page) => Math.max(page - 1, 1))
     }
+  }
+
+  const handlePanMouseDown: React.MouseEventHandler<HTMLDivElement> = (event) => {
+    if (!isPanMode || !contentRef.current || event.button !== 0) return
+
+    panSessionRef.current = {
+      startX: event.clientX,
+      startY: event.clientY,
+      scrollLeft: contentRef.current.scrollLeft,
+      scrollTop: contentRef.current.scrollTop
+    }
+
+    event.preventDefault()
+  }
+
+  const handlePanMouseMove: React.MouseEventHandler<HTMLDivElement> = (event) => {
+    if (!isPanMode || !contentRef.current || !panSessionRef.current) return
+
+    const { startX, startY, scrollLeft, scrollTop } = panSessionRef.current
+    contentRef.current.scrollLeft = scrollLeft - (event.clientX - startX)
+    contentRef.current.scrollTop = scrollTop - (event.clientY - startY)
+  }
+
+  const handlePanMouseUp = () => {
+    panSessionRef.current = null
   }
 
   const visibleMarkingsCount = highlightCoords.filter((coord) => coord.page === currentPage).length
@@ -442,6 +477,22 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         <div className="pdf-controls">
           <div className="control-group">
             <button
+              onClick={zoomOut}
+              disabled={loading || !pdfDoc}
+              className="btn-icon"
+              title="Zoom out"
+            >
+              <i className="fas fa-minus" />
+            </button>
+            <button
+              onClick={zoomIn}
+              disabled={loading || !pdfDoc}
+              className="btn-icon"
+              title="Zoom in"
+            >
+              <i className="fas fa-plus" />
+            </button>
+            <button
               onClick={fitWidth}
               disabled={loading || !pdfDoc}
               className={`btn-zoom ${zoomMode === 'fit-width' ? 'active' : ''}`}
@@ -465,11 +516,27 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
             >
               200%
             </button>
+            <button
+              onClick={() => setIsPanMode((currentValue) => !currentValue)}
+              disabled={loading || !pdfDoc}
+              className={`btn-icon ${isPanMode ? 'active' : ''}`}
+              title="Pan document"
+            >
+              <i className="fas fa-hand" />
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="pdf-content" ref={contentRef} onWheel={handleContentWheel}>
+      <div
+        className={`pdf-content ${isPanMode ? 'is-pan-mode' : ''}`}
+        ref={contentRef}
+        onWheel={handleContentWheel}
+        onMouseDown={handlePanMouseDown}
+        onMouseMove={handlePanMouseMove}
+        onMouseUp={handlePanMouseUp}
+        onMouseLeave={handlePanMouseUp}
+      >
         {loading && !pdfDoc && (
           <div className="pdf-loading-overlay">
             <div className="pdf-loader">
@@ -500,7 +567,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
           <div className="pdf-canvas-wrapper">
             <canvas ref={canvasRef} className="pdf-canvas" />
             <canvas ref={annotationCanvasRef} className="annotation-canvas" />
-            <div className="annotation-overlay-layer">
+            <div className={`annotation-overlay-layer ${isPanMode ? 'is-pan-mode' : ''}`}>
               {overlayButtons.map((overlay) => (
                 <button
                   key={overlay.key}

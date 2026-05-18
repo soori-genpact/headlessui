@@ -138,6 +138,15 @@
   justify-content: center;
 }
 
+.pdf-content.is-pan-mode {
+  cursor: grab;
+  user-select: none;
+}
+
+.pdf-content.is-pan-mode:active {
+  cursor: grabbing;
+}
+
 .pdf-content::-webkit-scrollbar {
   width: 12px;
   height: 12px;
@@ -177,6 +186,10 @@
   position: absolute;
   inset: 0;
   z-index: 3;
+}
+
+.annotation-overlay-layer.is-pan-mode {
+  pointer-events: none;
 }
 
 .annotation-hitbox {
