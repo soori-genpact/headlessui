@@ -119,8 +119,6 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
       try {
         setLoading(true)
         setError('')
-        setPdfDoc(null)
-        setHighlightCoords([])
 
         const url = `${baseUrl}/api/x_gegis_uwm_dashbo/v1/auditpageapi/attachment/${attachmentId}?format=binary`
         const response = await fetch(url, {
@@ -424,7 +422,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
           </div>
         )}
 
-        {!loading && !error && !!pdfDoc && (
+        {!error && !!pdfDoc && (
           <div className="pdf-canvas-wrapper">
             <canvas ref={canvasRef} className="pdf-canvas" />
             <canvas ref={annotationCanvasRef} className="annotation-canvas" />
