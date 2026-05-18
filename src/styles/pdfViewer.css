@@ -133,9 +133,6 @@
   background: #f8f9fa;
   padding: 2rem;
   position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
 }
 
 .pdf-content.is-pan-mode {
@@ -164,7 +161,10 @@
 
 .pdf-canvas-wrapper {
   position: relative;
-  display: inline-block;
+  display: block;
+  width: max-content;
+  max-width: none;
+  margin: 0 auto;
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   border-radius: 4px;

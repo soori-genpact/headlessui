@@ -61,6 +61,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(false)
   const [isPanMode, setIsPanMode] = useState(false)
+  const [panOffsetX, setPanOffsetX] = useState(0)
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null)
   const [error, setError] = useState('')
   const [pageSize, setPageSize] = useState<{ width: number; height: number } | null>(null)
@@ -68,12 +69,31 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const annotationCanvasRef = useRef<HTMLCanvasElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const canvasWrapperRef = useRef<HTMLDivElement>(null)
   const pageTransitionDirectionRef = useRef<'next' | 'prev' | null>(null)
   const wheelLockRef = useRef(0)
   const requestSeqRef = useRef(0)
   const pageRenderSeqRef = useRef(0)
-  const panSessionRef = useRef<{ startX: number; startY: number; scrollLeft: number; scrollTop: number } | null>(null)
+  const panSessionRef = useRef<{
+    startX: number
+    startY: number
+    scrollLeft: number
+    scrollTop: number
+    panOffsetX: number
+  } | null>(null)
   const { showToast } = useToast()
+
+  const getPanSlack = () => {
+    if (!contentRef.current || !canvasWrapperRef.current) return 0
+    return Math.max(0, contentRef.current.clientWidth - canvasWrapperRef.current.offsetWidth)
+  }
+
+  const clampPanOffsetX = (nextValue: number) => {
+    const slack = getPanSlack()
+    if (!slack) return 0
+    const limit = slack / 2
+    return Math.max(-limit, Math.min(limit, nextValue))
+  }
 
   const parseCoordinateString = (source: string): Coordinate | null => {
     const match = source.match(/D\((\d+),([\d.]+),([\d.]+),([\d.]+),([\d.]+),([\d.]+),([\d.]+),([\d.]+),([\d.]+)\)/)
@@ -228,6 +248,10 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
       setCurrentPage(firstPage)
     }
   }, [navigateKey, navigateSource])
+
+  useEffect(() => {
+    setPanOffsetX(0)
+  }, [attachmentId, currentPage, scale])
 
   useEffect(() => {
     const renderSeq = pageRenderSeqRef.current + 1
@@ -400,7 +424,8 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
       startX: event.clientX,
       startY: event.clientY,
       scrollLeft: contentRef.current.scrollLeft,
-      scrollTop: contentRef.current.scrollTop
+      scrollTop: contentRef.current.scrollTop,
+      panOffsetX
     }
 
     event.preventDefault()
@@ -409,9 +434,17 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   const handlePanMouseMove: React.MouseEventHandler<HTMLDivElement> = (event) => {
     if (!isPanMode || !contentRef.current || !panSessionRef.current) return
 
-    const { startX, startY, scrollLeft, scrollTop } = panSessionRef.current
-    contentRef.current.scrollLeft = scrollLeft - (event.clientX - startX)
-    contentRef.current.scrollTop = scrollTop - (event.clientY - startY)
+    const { startX, startY, scrollLeft, scrollTop, panOffsetX: startPanOffsetX } = panSessionRef.current
+    const deltaX = event.clientX - startX
+    const deltaY = event.clientY - startY
+
+    if (contentRef.current.scrollWidth > contentRef.current.clientWidth + 2) {
+      contentRef.current.scrollLeft = scrollLeft - deltaX
+      setPanOffsetX(0)
+    } else {
+      setPanOffsetX(clampPanOffsetX(startPanOffsetX + deltaX))
+    }
+    contentRef.current.scrollTop = scrollTop - deltaY
   }
 
   const handlePanMouseUp = () => {
@@ -564,7 +597,11 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         )}
 
         {!error && !!pdfDoc && (
-          <div className="pdf-canvas-wrapper">
+          <div
+            ref={canvasWrapperRef}
+            className="pdf-canvas-wrapper"
+            style={{ transform: `translateX(${panOffsetX}px)` }}
+          >
             <canvas ref={canvasRef} className="pdf-canvas" />
             <canvas ref={annotationCanvasRef} className="annotation-canvas" />
             <div className={`annotation-overlay-layer ${isPanMode ? 'is-pan-mode' : ''}`}>
