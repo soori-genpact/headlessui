@@ -22,6 +22,7 @@ type FieldState = 'review' | 'conflict' | 'missing' | 'validated'
 type FilterTab = 'review' | 'conflicts' | 'missing' | 'validated' | 'all'
 type SectionFilter = 'all'
 type MappingSort = 'confidence' | 'field'
+type Density = 'comfortable' | 'compact'
 
 type Coordinate = {
   page: number
@@ -203,6 +204,10 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
   const [overrideOnly, setOverrideOnly] = useState(false)
   const [overrideEditorFieldId, setOverrideEditorFieldId] = useState('')
   const [showAiSummary, setShowAiSummary] = useState(true)
+  const [density, setDensity] = useState<Density>('comfortable')
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
+  const [dirtyFieldIds, setDirtyFieldIds] = useState<Set<string>>(new Set())
+  const [showKeyHelp, setShowKeyHelp] = useState(false)
   const { showToast } = useToast()
 
   useEffect(() => {
@@ -477,6 +482,24 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
       ))
     )
     setHasChanges(true)
+    setDirtyFieldIds((previous) => {
+      if (previous.has(fieldId)) return previous
+      const next = new Set(previous)
+      next.add(fieldId)
+      return next
+    })
+  }
+
+  const toggleGroupCollapsed = (title: string) => {
+    setCollapsedGroups((previous) => {
+      const next = new Set(previous)
+      if (next.has(title)) {
+        next.delete(title)
+      } else {
+        next.add(title)
+      }
+      return next
+    })
   }
 
   const handleOverrideChange = (field: Field, value: string) => {
@@ -603,7 +626,7 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
   }
 
   const handleAcceptAllHighConfidence = () => {
-    let acceptedCount = 0
+    const acceptedIds: string[] = []
 
     setFields((previousFields) => previousFields.map((field) => {
       const belongsToSelectedDocument = field.attachmentData?.file_name === selectedDocument
@@ -617,7 +640,7 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
         && state === 'review'
         && field.field_value?.trim()
       ) {
-        acceptedCount += 1
+        acceptedIds.push(field.sys_id)
         return {
           ...field,
           data_verification: field.field_value,
@@ -628,9 +651,14 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
       return field
     }))
 
-    if (acceptedCount > 0) {
+    if (acceptedIds.length > 0) {
       setHasChanges(true)
-      showToast(`Accepted ${acceptedCount} high-confidence mappings on this document`, 'success', 3000)
+      setDirtyFieldIds((previous) => {
+        const next = new Set(previous)
+        acceptedIds.forEach((id) => next.add(id))
+        return next
+      })
+      showToast(`Accepted ${acceptedIds.length} high-confidence mappings on this document`, 'success', 3000)
     } else {
       showToast('No high-confidence review mappings on this document', 'info', 2500)
     }
@@ -663,6 +691,53 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
       setCompleting(false)
     }
   }
+
+  useEffect(() => {
+    const isTypingTarget = (target: EventTarget | null): boolean => {
+      if (!(target instanceof HTMLElement)) return false
+      const tag = target.tagName
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable
+    }
+
+    const handler = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return
+      if (isTypingTarget(event.target)) return
+
+      const list = filteredFields
+      const currentIndex = list.findIndex((field) => field.sys_id === selectedFieldId)
+
+      if (event.key === 'j' || event.key === 'ArrowDown') {
+        if (!list.length) return
+        event.preventDefault()
+        const nextIndex = currentIndex < 0 ? 0 : Math.min(currentIndex + 1, list.length - 1)
+        const nextField = list[nextIndex]
+        if (nextField) handleNavigateToField(nextField)
+      } else if (event.key === 'k' || event.key === 'ArrowUp') {
+        if (!list.length) return
+        event.preventDefault()
+        const nextIndex = currentIndex < 0 ? 0 : Math.max(currentIndex - 1, 0)
+        const nextField = list[nextIndex]
+        if (nextField) handleNavigateToField(nextField)
+      } else if (event.key === 'a' && selectedField) {
+        event.preventDefault()
+        handleAcceptField(selectedField)
+      } else if (event.key === 'c' && selectedField) {
+        event.preventDefault()
+        handleToggleConflict(selectedField)
+      } else if (event.key === 'o' && selectedField) {
+        event.preventDefault()
+        setOverrideEditorFieldId((currentValue) => currentValue === selectedField.sys_id ? '' : selectedField.sys_id)
+      } else if (event.key === '?' || (event.shiftKey && event.key === '/')) {
+        event.preventDefault()
+        setShowKeyHelp((previous) => !previous)
+      } else if (event.key === 'Escape') {
+        if (showKeyHelp) setShowKeyHelp(false)
+      }
+    }
+
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [filteredFields, selectedField, selectedFieldId, showKeyHelp])
 
   if (loading) {
     return (
@@ -971,23 +1046,75 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                   <i className="fas fa-pen" />
                   Overrides
                 </button>
+
+                <div className="audit-v2-density-toggle" role="group" aria-label="Row density">
+                  <button
+                    type="button"
+                    className={density === 'comfortable' ? 'is-active' : ''}
+                    onClick={() => setDensity('comfortable')}
+                    aria-pressed={density === 'comfortable'}
+                    title="Comfortable rows"
+                  >
+                    <i className="fas fa-bars" />
+                  </button>
+                  <button
+                    type="button"
+                    className={density === 'compact' ? 'is-active' : ''}
+                    onClick={() => setDensity('compact')}
+                    aria-pressed={density === 'compact'}
+                    title="Compact rows"
+                  >
+                    <i className="fas fa-grip-lines" />
+                  </button>
+                </div>
               </div>
 
               <div className="audit-v2-toolbar-summary">
                 <span>{selectedDocumentFields.length} extracted mappings</span>
                 <span>{overlayFields.length} linked to the document</span>
                 <span>{filteredFields.length} shown after filters</span>
+                {dirtyFieldIds.size > 0 && (
+                  <span className="audit-v2-toolbar-summary-edited">
+                    <span className="audit-v2-dirty-dot" aria-hidden="true" />
+                    {dirtyFieldIds.size} edited this session
+                  </span>
+                )}
+                <button
+                  type="button"
+                  className="audit-v2-toolbar-keyhint"
+                  onClick={() => setShowKeyHelp((previous) => !previous)}
+                  title="Show keyboard shortcuts"
+                  aria-pressed={showKeyHelp}
+                >
+                  Press <kbd>?</kbd> for shortcuts
+                </button>
               </div>
             </div>
 
-            <div className="audit-v2-field-groups">
-              {groupedFields.map((group) => (
-                <section key={group.title} className="audit-v2-field-group">
-                  <div className="audit-v2-group-head">
+            <div className={`audit-v2-field-groups audit-v2-density-${density}`}>
+              {groupedFields.map((group) => {
+                const isCollapsed = collapsedGroups.has(group.title)
+                const dirtyInGroup = group.items.reduce((count, item) => count + (dirtyFieldIds.has(item.sys_id) ? 1 : 0), 0)
+                return (
+                <section key={group.title} className={`audit-v2-field-group ${isCollapsed ? 'is-collapsed' : ''}`}>
+                  <button
+                    type="button"
+                    className="audit-v2-group-head"
+                    onClick={() => toggleGroupCollapsed(group.title)}
+                    aria-expanded={!isCollapsed}
+                  >
+                    <i className={`fas fa-chevron-${isCollapsed ? 'right' : 'down'} audit-v2-group-caret`} />
                     <span className="audit-v2-label">{group.title}</span>
                     <strong>{group.items.length}</strong>
-                  </div>
+                    {dirtyInGroup > 0 && (
+                      <span className="audit-v2-group-dirty" title={`${dirtyInGroup} edited`}>
+                        <span className="audit-v2-dirty-dot" aria-hidden="true" />
+                        {dirtyInGroup}
+                      </span>
+                    )}
+                  </button>
 
+                  {!isCollapsed && (
                   <div className="audit-v2-field-list">
                     {group.items.map((field) => {
                       const resolvedValue = getResolvedValue(field)
@@ -1015,6 +1142,9 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                         >
                           <div className="audit-v2-field-compact-row">
                             <div className="audit-v2-field-compact-main">
+                              {dirtyFieldIds.has(field.sys_id) && (
+                                <span className="audit-v2-dirty-dot" title="Edited this session" aria-label="Edited this session" />
+                              )}
                               <span className="audit-v2-field-compact-name">{field.field_name || 'Unnamed field'}</span>
                               <span className={`audit-v2-field-compact-value ${(resolvedValue || extractedValue) ? '' : 'is-empty'}`}>
                                 {resolvedValue || extractedValue || 'No extracted value'}
@@ -1090,14 +1220,61 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                                   />
                                 </div>
                               )}
+
+                              <div className="audit-v2-peek" onClick={(event) => event.stopPropagation()}>
+                                <div className="audit-v2-peek-diff" role="table" aria-label="Value comparison">
+                                  <div className="audit-v2-peek-row" role="row">
+                                    <span className="audit-v2-peek-label" role="rowheader">AI</span>
+                                    <span className={`audit-v2-peek-value ${extractedValue ? '' : 'is-empty'}`} role="cell">
+                                      {extractedValue || 'No extracted value'}
+                                    </span>
+                                    <span className="audit-v2-peek-meta" role="cell">
+                                      {formatConfidence(field.confidence_indicator)}%
+                                    </span>
+                                  </div>
+                                  <div className="audit-v2-peek-row" role="row">
+                                    <span className="audit-v2-peek-label" role="rowheader">Verified</span>
+                                    <span className={`audit-v2-peek-value ${field.data_verification?.trim() ? '' : 'is-empty'}`} role="cell">
+                                      {field.data_verification?.trim() || 'Not verified yet'}
+                                    </span>
+                                    <span className="audit-v2-peek-meta" role="cell">human</span>
+                                  </div>
+                                  {field.qa_override_value?.trim() && (
+                                    <div className="audit-v2-peek-row is-override" role="row">
+                                      <span className="audit-v2-peek-label" role="rowheader">Override</span>
+                                      <span className="audit-v2-peek-value" role="cell">{field.qa_override_value}</span>
+                                      <span className="audit-v2-peek-meta" role="cell">you</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {(field.logic_transparency || field.commentary) && (
+                                  <div className="audit-v2-peek-notes">
+                                    {field.logic_transparency && (
+                                      <p>
+                                        <i className="fas fa-wand-magic-sparkles" aria-hidden="true" />
+                                        <span>{field.logic_transparency}</span>
+                                      </p>
+                                    )}
+                                    {field.commentary && (
+                                      <p>
+                                        <i className="far fa-comment" aria-hidden="true" />
+                                        <span>{field.commentary}</span>
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           )}
                         </article>
                       )
                     })}
                   </div>
+                  )}
                 </section>
-              ))}
+                )
+              })}
 
               {!groupedFields.length && (
                 <div className="audit-v2-empty-state">
@@ -1149,6 +1326,46 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
           </div>
         </aside>
       </section>
+
+      <button
+        type="button"
+        className={`audit-v2-kbd-trigger ${showKeyHelp ? 'is-active' : ''}`}
+        onClick={() => setShowKeyHelp((previous) => !previous)}
+        title="Keyboard shortcuts"
+        aria-label="Toggle keyboard shortcuts"
+        aria-expanded={showKeyHelp}
+      >
+        <i className="far fa-keyboard" />
+      </button>
+
+      {showKeyHelp && (
+        <div className="audit-v2-kbd-help" role="dialog" aria-label="Keyboard shortcuts">
+          <div className="audit-v2-kbd-help-head">
+            <strong>
+              <i className="far fa-keyboard" />
+              Keyboard
+            </strong>
+            <button
+              type="button"
+              className="audit-v2-icon-button"
+              onClick={() => setShowKeyHelp(false)}
+              aria-label="Close shortcuts"
+            >
+              <i className="fas fa-xmark" />
+            </button>
+          </div>
+          <ul>
+            <li><span><kbd>J</kbd><kbd>↓</kbd></span><em>Next field</em></li>
+            <li><span><kbd>K</kbd><kbd>↑</kbd></span><em>Previous field</em></li>
+            <li><span><kbd>A</kbd></span><em>Accept AI value</em></li>
+            <li><span><kbd>C</kbd></span><em>Toggle conflict</em></li>
+            <li><span><kbd>O</kbd></span><em>Open override editor</em></li>
+            <li><span><kbd>?</kbd></span><em>Toggle this panel</em></li>
+            <li><span><kbd>Esc</kbd></span><em>Close</em></li>
+          </ul>
+          <p className="audit-v2-kbd-help-foot">Shortcuts skip while typing in inputs.</p>
+        </div>
+      )}
     </div>
   )
 }

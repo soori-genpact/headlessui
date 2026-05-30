@@ -1122,6 +1122,404 @@
   color: var(--audit-v2-text);
 }
 
+/* ---------- Data-Dense UX: density toggle ---------- */
+.audit-v2-density-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 10px;
+  border: 1px solid var(--audit-v2-border);
+  background: #fff;
+  gap: 2px;
+}
+
+.audit-v2-density-toggle button {
+  height: 26px;
+  width: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--audit-v2-subtle);
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.audit-v2-density-toggle button:hover {
+  color: var(--audit-v2-text);
+  background: var(--audit-v2-panel-muted);
+}
+
+.audit-v2-density-toggle button.is-active {
+  background: var(--audit-v2-indigo-soft);
+  color: var(--audit-v2-indigo);
+}
+
+/* ---------- Data-Dense UX: collapsible group head ---------- */
+.audit-v2-group-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 6px 4px;
+  margin-bottom: 6px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.audit-v2-group-head:hover {
+  background: var(--audit-v2-panel-muted);
+}
+
+.audit-v2-group-head .audit-v2-group-caret {
+  width: 10px;
+  font-size: 10px;
+  color: var(--audit-v2-subtle);
+  transition: transform 0.15s ease;
+}
+
+.audit-v2-group-head strong {
+  font-family: var(--font-family-mono);
+  font-size: 11px;
+  color: var(--audit-v2-subtle);
+  margin-left: auto;
+}
+
+.audit-v2-group-dirty {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--audit-v2-indigo);
+  font-family: var(--font-family-mono);
+}
+
+.audit-v2-field-group.is-collapsed {
+  margin-bottom: 0;
+}
+
+/* ---------- Data-Dense UX: compact density ---------- */
+.audit-v2-density-compact .audit-v2-field-list {
+  gap: 4px;
+}
+
+.audit-v2-density-compact .audit-v2-field-card {
+  padding: 5px 9px;
+  border-radius: 10px;
+  border-left-width: 3px;
+}
+
+.audit-v2-density-compact .audit-v2-field-compact-name {
+  font-size: 9px;
+  max-width: 38%;
+}
+
+.audit-v2-density-compact .audit-v2-field-compact-value {
+  font-size: 12px;
+}
+
+.audit-v2-density-compact .audit-v2-confidence {
+  font-size: 10px;
+}
+
+.audit-v2-density-compact .audit-v2-confidence-bar {
+  width: 24px;
+  height: 3px;
+}
+
+.audit-v2-density-compact .audit-v2-status-tag {
+  min-height: 18px;
+  font-size: 10px;
+  padding: 0 6px;
+}
+
+.audit-v2-density-compact .audit-v2-field-card:not(.is-selected) .audit-v2-status-tag {
+  display: none;
+}
+
+.audit-v2-density-compact .audit-v2-field-group + .audit-v2-field-group {
+  margin-top: 8px;
+}
+
+/* ---------- Data-Dense UX: edited-this-session dot ---------- */
+.audit-v2-dirty-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--audit-v2-indigo);
+  box-shadow: 0 0 0 3px rgba(68, 83, 255, 0.14);
+  flex-shrink: 0;
+}
+
+.audit-v2-field-compact-main .audit-v2-dirty-dot {
+  margin-right: 2px;
+}
+
+.audit-v2-toolbar-summary-edited {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--audit-v2-indigo);
+  font-weight: 600;
+}
+
+.audit-v2-toolbar-keyhint {
+  margin-left: auto;
+  border: 1px dashed var(--audit-v2-border-strong);
+  background: transparent;
+  color: var(--audit-v2-subtle);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.audit-v2-toolbar-keyhint:hover,
+.audit-v2-toolbar-keyhint[aria-pressed="true"] {
+  background: var(--audit-v2-indigo-soft);
+  color: var(--audit-v2-indigo);
+  border-color: rgba(68, 83, 255, 0.4);
+  border-style: solid;
+}
+
+.audit-v2-toolbar-keyhint kbd {
+  font-family: var(--font-family-mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid var(--audit-v2-border);
+  color: var(--audit-v2-text);
+}
+
+/* ---------- Data-Dense UX: insights peek (progressive disclosure) ---------- */
+.audit-v2-peek {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(247, 249, 255, 0.85), rgba(255, 255, 255, 0.95));
+  border: 1px solid rgba(68, 83, 255, 0.10);
+  cursor: default;
+}
+
+.audit-v2-peek-diff {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.audit-v2-peek-row {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.audit-v2-peek-row.is-override {
+  background: var(--audit-v2-indigo-soft);
+}
+
+.audit-v2-peek-label {
+  font-family: var(--font-family-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--audit-v2-subtle);
+  font-weight: 700;
+}
+
+.audit-v2-peek-row.is-override .audit-v2-peek-label {
+  color: var(--audit-v2-indigo);
+}
+
+.audit-v2-peek-value {
+  font-size: 12px;
+  color: var(--audit-v2-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.audit-v2-peek-value.is-empty {
+  color: var(--audit-v2-subtle);
+  font-style: italic;
+}
+
+.audit-v2-peek-meta {
+  font-family: var(--font-family-mono);
+  font-size: 10px;
+  color: var(--audit-v2-subtle);
+  text-align: right;
+}
+
+.audit-v2-peek-notes {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(68, 83, 255, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.audit-v2-peek-notes p {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--audit-v2-zinc);
+}
+
+.audit-v2-peek-notes p i {
+  margin-top: 3px;
+  color: var(--audit-v2-violet);
+  font-size: 11px;
+}
+
+/* Hide peek in compact density unless the row is selected — it already is, but reduce noise */
+.audit-v2-density-compact .audit-v2-peek {
+  padding: 8px;
+}
+
+.audit-v2-density-compact .audit-v2-peek-notes {
+  display: none;
+}
+
+/* ---------- Data-Dense UX: keyboard help ---------- */
+.audit-v2-kbd-trigger {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  z-index: 40;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid var(--audit-v2-border);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--audit-v2-subtle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.audit-v2-kbd-trigger:hover {
+  color: var(--audit-v2-indigo);
+  transform: translateY(-1px);
+}
+
+.audit-v2-kbd-trigger.is-active {
+  background: var(--audit-v2-indigo);
+  color: #fff;
+  border-color: var(--audit-v2-indigo);
+}
+
+.audit-v2-kbd-help {
+  position: fixed;
+  bottom: 66px;
+  right: 18px;
+  z-index: 41;
+  width: 260px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid var(--audit-v2-border);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.14);
+  backdrop-filter: blur(12px);
+  animation: audit-v2-kbd-pop 0.18s ease-out;
+}
+
+@keyframes audit-v2-kbd-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.audit-v2-kbd-help-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.audit-v2-kbd-help-head strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--audit-v2-text);
+}
+
+.audit-v2-kbd-help ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.audit-v2-kbd-help li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--audit-v2-text);
+}
+
+.audit-v2-kbd-help li span {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.audit-v2-kbd-help li em {
+  font-style: normal;
+  color: var(--audit-v2-subtle);
+  font-size: 11px;
+}
+
+.audit-v2-kbd-help kbd {
+  font-family: var(--font-family-mono);
+  font-size: 10px;
+  min-width: 18px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--audit-v2-panel-muted);
+  border: 1px solid var(--audit-v2-border);
+  color: var(--audit-v2-text);
+  text-align: center;
+}
+
+.audit-v2-kbd-help-foot {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed var(--audit-v2-border);
+  font-size: 10px;
+  color: var(--audit-v2-subtle);
+}
+
 @media (max-width: 1380px) {
   .audit-v2-workspace {
     grid-template-columns: 270px minmax(0, 1fr) 360px;
