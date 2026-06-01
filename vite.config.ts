@@ -66,8 +66,33 @@ function authProxyPlugin() {
   }
 }
 
+// Serve the static docs catalog (public/docs) at /docs and /docs/ in dev,
+// before Vite's SPA fallback rewrites bare directory requests to the app shell.
+function docsMountPlugin() {
+  return {
+    name: 'docs-mount-plugin',
+    configureServer(server: any) {
+      server.middlewares.use((req: any, res: any, next: any) => {
+        const url = (req.url || '').split('?')[0]
+        // Redirect bare /docs -> /docs/ so relative asset paths (screens/*.png)
+        // resolve under /docs/ in the browser instead of the site root.
+        if (url === '/docs') {
+          res.statusCode = 301
+          res.setHeader('Location', '/docs/')
+          res.end()
+          return
+        }
+        if (url === '/docs/') {
+          req.url = '/docs/index.html'
+        }
+        next()
+      })
+    }
+  }
+}
+
 export default defineConfig({
-  plugins: [react(), authProxyPlugin()],
+  plugins: [react(), authProxyPlugin(), docsMountPlugin()],
   server: {
     port: 5173,
     open: true

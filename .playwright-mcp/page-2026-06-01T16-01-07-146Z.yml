@@ -1,0 +1,1366 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - paragraph [ref=e4]:
+      - generic [ref=e5]: GG
+      - generic [ref=e6]: GEGIS Library
+    - paragraph [ref=e7]: "scope: x_gegis_library"
+    - navigation [ref=e8]:
+      - link "Overview" [ref=e9] [cursor=pointer]:
+        - /url: "#top"
+      - link "Product Selector" [ref=e10] [cursor=pointer]:
+        - /url: "#product-selector"
+        - img [ref=e12]
+        - text: Product Selector
+      - link "Selected Product Summary" [ref=e19] [cursor=pointer]:
+        - /url: "#selected-product"
+        - img [ref=e21]
+        - text: Selected Product Summary
+      - link "Quote Versions Comparison" [ref=e24] [cursor=pointer]:
+        - /url: "#quote-comparison"
+        - img [ref=e26]
+        - text: Quote Versions Comparison
+      - link "Quote Options Action Bar" [ref=e28] [cursor=pointer]:
+        - /url: "#quote-action-bar"
+        - img [ref=e30]
+        - text: Quote Options Action Bar
+      - link "Peril-Specific Deductibles" [ref=e36] [cursor=pointer]:
+        - /url: "#peril-deductibles"
+        - img [ref=e38]
+        - text: Peril-Specific Deductibles
+      - link "Dashboard Metric Card" [ref=e44] [cursor=pointer]:
+        - /url: "#metric-card"
+        - img [ref=e46]
+        - text: Dashboard Metric Card
+      - link "Collapse / Expand Panel" [ref=e51] [cursor=pointer]:
+        - /url: "#collapse"
+        - img [ref=e53]
+        - text: Collapse / Expand Panel
+      - link "Dynamic Form" [ref=e57] [cursor=pointer]:
+        - /url: "#dynamic-form"
+        - img [ref=e59]
+        - text: Dynamic Form
+      - link "Endorsement Card" [ref=e65] [cursor=pointer]:
+        - /url: "#endorsement-card"
+        - img [ref=e67]
+        - text: Endorsement Card
+      - link "Extraction Summary Card" [ref=e72] [cursor=pointer]:
+        - /url: "#extraction-summary"
+        - img [ref=e74]
+        - text: Extraction Summary Card
+      - link "Toggle Card" [ref=e78] [cursor=pointer]:
+        - /url: "#toggle-card"
+        - img [ref=e80]
+        - text: Toggle Card
+    - paragraph [ref=e86]:
+      - text: ServiceNow Next Experience custom components — each composes standard Horizon
+      - code [ref=e87]: now-*
+      - text: components and is configured + bound entirely through UI Builder.
+  - main [ref=e88]:
+    - generic [ref=e89]:
+      - heading "ServiceNow Component Catalog" [level=1] [ref=e90]
+      - paragraph [ref=e91]:
+        - text: Reference for the
+        - strong [ref=e92]: x_gegis_library
+        - text: Next Experience components — configuration properties, dispatched events (with payloads), and copy-paste sample inputs.
+      - generic [ref=e93]:
+        - generic [ref=e94]:
+          - generic [ref=e95]: "11"
+          - text: Components
+        - generic [ref=e96]:
+          - generic [ref=e97]: "19"
+          - text: Bindable events
+        - generic [ref=e98]:
+          - generic [ref=e99]: x_gegis_library
+          - text: Scope
+      - generic [ref=e100]:
+        - heading "How these components work" [level=3] [ref=e101]
+        - list [ref=e102]:
+          - listitem [ref=e103]:
+            - strong [ref=e104]: "Composition:"
+            - text: built from standard Horizon
+            - code [ref=e105]: now-*
+            - text: components, customized via properties / slots / design tokens — never hand-rolled.
+          - listitem [ref=e106]:
+            - strong [ref=e107]: "Configuration:"
+            - text: every property below is set in UI Builder and bindable to data resources / client state.
+          - listitem [ref=e108]:
+            - strong [ref=e109]: "Events:"
+            - text: declared as
+            - code [ref=e110]: actions
+            - text: so they appear in the UI Builder
+            - emphasis [ref=e111]: Events
+            - text: tab. Only events an external page needs to bind are exposed — purely internal UI state isn't.
+    - generic [ref=e112]:
+      - generic [ref=e113]:
+        - img [ref=e115]
+        - generic [ref=e122]:
+          - heading "Product Selector" [level=2] [ref=e123]
+          - generic [ref=e124]:
+            - generic [ref=e125]: <x-gegis-library-product-selector>
+            - generic [ref=e126]: primitives
+            - generic [ref=e127]: 3 props
+            - generic [ref=e128]: 1 events
+      - paragraph [ref=e129]: "A single-select (radio) group of product cards: each option has a title, optional subtitle + checkmark bullets, and a pill. Composes now-card + now-highlighted-value + now-icon."
+      - paragraph [ref=e130]:
+        - strong [ref=e131]: "Standard components used:"
+        - generic [ref=e132]: now-card
+        - generic [ref=e133]: now-icon
+      - figure "Sample preview (local)." [ref=e134]:
+        - img "Product Selector preview" [ref=e135]
+        - generic [ref=e136]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e137]
+      - table [ref=e138]:
+        - rowgroup [ref=e139]:
+          - row "Property Label Type Default Description" [ref=e140]:
+            - columnheader "Property" [ref=e141]
+            - columnheader "Label" [ref=e142]
+            - columnheader "Type" [ref=e143]
+            - columnheader "Default" [ref=e144]
+            - columnheader "Description" [ref=e145]
+        - rowgroup [ref=e146]:
+          - 'row "options Options json — Array of product options. Each: { id, title, subtitle, bullets:[string], pill, pillTone: info|neutral|positive|warning|error, pillIcon }." [ref=e147]':
+            - cell "options" [ref=e148]:
+              - code [ref=e149]: options
+            - cell "Options" [ref=e150]
+            - cell "json" [ref=e151]
+            - cell "—" [ref=e152]
+            - 'cell "Array of product options. Each: { id, title, subtitle, bullets:[string], pill, pillTone: info|neutral|positive|warning|error, pillIcon }." [ref=e153]'
+          - row "value Selected option id string The id of the currently selected option. Leave empty to select the first option by default." [ref=e154]:
+            - cell "value" [ref=e155]:
+              - code [ref=e156]: value
+            - cell "Selected option id" [ref=e157]
+            - cell "string" [ref=e158]
+            - cell [ref=e159]:
+              - code [ref=e160]
+            - cell "The id of the currently selected option. Leave empty to select the first option by default." [ref=e161]
+          - row "bulletsWhenSelectedOnly Show details only when selected boolean true When on, the subtitle and bullet points show only for the selected card." [ref=e162]:
+            - cell "bulletsWhenSelectedOnly" [ref=e163]:
+              - code [ref=e164]: bulletsWhenSelectedOnly
+            - cell "Show details only when selected" [ref=e165]
+            - cell "boolean" [ref=e166]
+            - cell "true" [ref=e167]:
+              - code [ref=e168]: "true"
+            - cell "When on, the subtitle and bullet points show only for the selected card." [ref=e169]
+      - heading "Events" [level=3] [ref=e170]
+      - table [ref=e171]:
+        - rowgroup [ref=e172]:
+          - row "Event Label Payload When / use" [ref=e173]:
+            - columnheader "Event" [ref=e174]
+            - columnheader "Label" [ref=e175]
+            - columnheader "Payload" [ref=e176]
+            - columnheader "When / use" [ref=e177]
+        - rowgroup [ref=e178]:
+          - 'row "PRODUCT_SELECTED Product selected value:string Fired when the user selects an option. Payload: { value }." [ref=e179]':
+            - cell "PRODUCT_SELECTED" [ref=e180]:
+              - code [ref=e181]: PRODUCT_SELECTED
+            - cell "Product selected" [ref=e182]
+            - cell "value:string" [ref=e183]:
+              - code [ref=e184]: value
+              - text: :string
+            - 'cell "Fired when the user selects an option. Payload: { value }." [ref=e185]'
+      - heading "Sample input JSON" [level=3] [ref=e186]
+      - heading "options sample" [level=4] [ref=e187]:
+        - code [ref=e188]: options
+        - text: sample
+      - generic [ref=e189]:
+        - button "Copy" [ref=e190] [cursor=pointer]
+        - code [ref=e192]: "[ { \"id\": \"commercial-standard\", \"title\": \"Commercial Property – Standard Plan\", \"pill\": \"AI Recommended\", \"pillTone\": \"info\", \"pillIcon\": \"sparkles-outline\", \"subtitle\": \"Why we recommend:\", \"bullets\": [ \"Matches industry: Manufacturing\", \"Covers key risks: Fire, Machinery\", \"Within underwriting guidelines\", \"Balanced premium vs coverage\" ] }, { \"id\": \"commercial-premium\", \"title\": \"Commercial Property – Premium Plan\", \"pill\": \"Best Coverage\", \"pillTone\": \"positive\", \"pillIcon\": \"shield-outline\", \"subtitle\": \"What's included:\", \"bullets\": [ \"Full replacement-cost cover\", \"Equipment breakdown included\", \"24/7 priority claims handling\" ] }, { \"id\": \"flood\", \"title\": \"Flood Insurance\", \"pill\": \"Higher Protection\", \"pillTone\": \"neutral\", \"bullets\": [] }, { \"id\": \"business\", \"title\": \"Business Interruption\", \"pill\": \"Lower Premium\", \"pillTone\": \"neutral\", \"bullets\": [] }, { \"id\": \"cyber\", \"title\": \"Cyber Liability\", \"pill\": \"Add-on\", \"pillTone\": \"warning\", \"bullets\": [] } ]"
+    - generic [ref=e193]:
+      - generic [ref=e194]:
+        - img [ref=e196]
+        - generic [ref=e199]:
+          - heading "Selected Product Summary" [level=2] [ref=e200]
+          - generic [ref=e201]:
+            - generic [ref=e202]: <x-gegis-library-selected-product>
+            - generic [ref=e203]: primitives
+            - generic [ref=e204]: 12 props
+            - generic [ref=e205]: 3 events
+      - paragraph [ref=e206]: A selected-product summary bar (icon, product name, star, subtitle) with a Change Product action that opens a confirmation modal. Composes now-icon + now-button + now-modal.
+      - paragraph [ref=e207]:
+        - strong [ref=e208]: "Standard components used:"
+        - generic [ref=e209]: now-icon
+        - generic [ref=e210]: now-button
+        - generic [ref=e211]: now-modal
+      - figure "Sample preview (local)." [ref=e212]:
+        - img "Selected Product Summary preview"
+        - generic [ref=e213]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e214]
+      - table [ref=e215]:
+        - rowgroup [ref=e216]:
+          - row "Property Label Type Default Description" [ref=e217]:
+            - columnheader "Property" [ref=e218]
+            - columnheader "Label" [ref=e219]
+            - columnheader "Type" [ref=e220]
+            - columnheader "Default" [ref=e221]
+            - columnheader "Description" [ref=e222]
+        - rowgroup [ref=e223]:
+          - 'row "productPrefix Product label prefix string Product: Text shown before the product name (e.g. \"Product:\"). Leave empty to show only the name." [ref=e224]':
+            - cell "productPrefix" [ref=e225]:
+              - code [ref=e226]: productPrefix
+            - cell "Product label prefix" [ref=e227]
+            - cell "string" [ref=e228]
+            - cell "Product:" [ref=e229]:
+              - code [ref=e230]: "Product:"
+            - cell "Text shown before the product name (e.g. \"Product:\"). Leave empty to show only the name." [ref=e231]
+          - row "productName Product name string Commercial Property – Standard Plan The selected product's name." [ref=e232]:
+            - cell "productName" [ref=e233]:
+              - code [ref=e234]: productName
+            - cell "Product name" [ref=e235]
+            - cell "string" [ref=e236]
+            - cell "Commercial Property – Standard Plan" [ref=e237]:
+              - code [ref=e238]: Commercial Property – Standard Plan
+            - cell "The selected product's name." [ref=e239]
+          - row "subtitle Subtitle string Base limits and clauses applied from selected product Secondary line under the product name." [ref=e240]:
+            - cell "subtitle" [ref=e241]:
+              - code [ref=e242]: subtitle
+            - cell "Subtitle" [ref=e243]
+            - cell "string" [ref=e244]
+            - cell "Base limits and clauses applied from selected product" [ref=e245]:
+              - code [ref=e246]: Base limits and clauses applied from selected product
+            - cell "Secondary line under the product name." [ref=e247]
+          - row "icon Leading icon string shield-outline now-icon name shown at the start of the bar. Leave empty to hide." [ref=e248]:
+            - cell "icon" [ref=e249]:
+              - code [ref=e250]: icon
+            - cell "Leading icon" [ref=e251]
+            - cell "string" [ref=e252]
+            - cell "shield-outline" [ref=e253]:
+              - code [ref=e254]: shield-outline
+            - cell "now-icon name shown at the start of the bar. Leave empty to hide." [ref=e255]
+          - row "showStar Show star boolean true When on, shows a star after the product name (e.g. a recommended indicator)." [ref=e256]:
+            - cell "showStar" [ref=e257]:
+              - code [ref=e258]: showStar
+            - cell "Show star" [ref=e259]
+            - cell "boolean" [ref=e260]
+            - cell "true" [ref=e261]:
+              - code [ref=e262]: "true"
+            - cell "When on, shows a star after the product name (e.g. a recommended indicator)." [ref=e263]
+          - row "starIcon Star icon string star-fill now-icon name for the star indicator." [ref=e264]:
+            - cell "starIcon" [ref=e265]:
+              - code [ref=e266]: starIcon
+            - cell "Star icon" [ref=e267]
+            - cell "string" [ref=e268]
+            - cell "star-fill" [ref=e269]:
+              - code [ref=e270]: star-fill
+            - cell "now-icon name for the star indicator." [ref=e271]
+          - row "changeButtonLabel Change button label string Change Product Label for the action button on the bar." [ref=e272]:
+            - cell "changeButtonLabel" [ref=e273]:
+              - code [ref=e274]: changeButtonLabel
+            - cell "Change button label" [ref=e275]
+            - cell "string" [ref=e276]
+            - cell "Change Product" [ref=e277]:
+              - code [ref=e278]: Change Product
+            - cell "Label for the action button on the bar." [ref=e279]
+          - row "confirmHeader Confirm dialog header string Change Product Title of the confirmation modal." [ref=e280]:
+            - cell "confirmHeader" [ref=e281]:
+              - code [ref=e282]: confirmHeader
+            - cell "Confirm dialog header" [ref=e283]
+            - cell "string" [ref=e284]
+            - cell "Change Product" [ref=e285]:
+              - code [ref=e286]: Change Product
+            - cell "Title of the confirmation modal." [ref=e287]
+          - row "confirmMessage Confirm dialog message string Changing the product will archive all existing quote options. This action cannot be undone. Body text of the confirmation modal." [ref=e288]:
+            - cell "confirmMessage" [ref=e289]:
+              - code [ref=e290]: confirmMessage
+            - cell "Confirm dialog message" [ref=e291]
+            - cell "string" [ref=e292]
+            - cell "Changing the product will archive all existing quote options. This action cannot be undone." [ref=e293]:
+              - code [ref=e294]: Changing the product will archive all existing quote options. This action cannot be undone.
+            - cell "Body text of the confirmation modal." [ref=e295]
+          - row "confirmIcon Confirm dialog icon string circle-exclamation-outline now-icon name shown beside the confirmation message (warning glyph). Leave empty to hide." [ref=e296]:
+            - cell "confirmIcon" [ref=e297]:
+              - code [ref=e298]: confirmIcon
+            - cell "Confirm dialog icon" [ref=e299]
+            - cell "string" [ref=e300]
+            - cell "circle-exclamation-outline" [ref=e301]:
+              - code [ref=e302]: circle-exclamation-outline
+            - cell "now-icon name shown beside the confirmation message (warning glyph). Leave empty to hide." [ref=e303]
+          - row "confirmLabel Confirm button label string Continue Primary (confirm) button label in the modal footer." [ref=e304]:
+            - cell "confirmLabel" [ref=e305]:
+              - code [ref=e306]: confirmLabel
+            - cell "Confirm button label" [ref=e307]
+            - cell "string" [ref=e308]
+            - cell "Continue" [ref=e309]:
+              - code [ref=e310]: Continue
+            - cell "Primary (confirm) button label in the modal footer." [ref=e311]
+          - row "cancelLabel Cancel button label string Cancel Secondary (cancel) button label in the modal footer." [ref=e312]:
+            - cell "cancelLabel" [ref=e313]:
+              - code [ref=e314]: cancelLabel
+            - cell "Cancel button label" [ref=e315]
+            - cell "string" [ref=e316]
+            - cell "Cancel" [ref=e317]:
+              - code [ref=e318]: Cancel
+            - cell "Secondary (cancel) button label in the modal footer." [ref=e319]
+      - heading "Events" [level=3] [ref=e320]
+      - table [ref=e321]:
+        - rowgroup [ref=e322]:
+          - row "Event Label Payload When / use" [ref=e323]:
+            - columnheader "Event" [ref=e324]
+            - columnheader "Label" [ref=e325]
+            - columnheader "Payload" [ref=e326]
+            - columnheader "When / use" [ref=e327]
+        - rowgroup [ref=e328]:
+          - row "CHANGE_PRODUCT_REQUESTED Change product requested productName:string Fired when the user clicks Change Product (the confirmation modal opens)." [ref=e329]:
+            - cell "CHANGE_PRODUCT_REQUESTED" [ref=e330]:
+              - code [ref=e331]: CHANGE_PRODUCT_REQUESTED
+            - cell "Change product requested" [ref=e332]
+            - cell "productName:string" [ref=e333]:
+              - code [ref=e334]: productName
+              - text: :string
+            - cell "Fired when the user clicks Change Product (the confirmation modal opens)." [ref=e335]
+          - row "CHANGE_PRODUCT_CONFIRMED Change product confirmed productName:string Fired when the user confirms the change in the modal (primary action). Use this to archive existing quote options and return to product selection." [ref=e336]:
+            - cell "CHANGE_PRODUCT_CONFIRMED" [ref=e337]:
+              - code [ref=e338]: CHANGE_PRODUCT_CONFIRMED
+            - cell "Change product confirmed" [ref=e339]
+            - cell "productName:string" [ref=e340]:
+              - code [ref=e341]: productName
+              - text: :string
+            - cell "Fired when the user confirms the change in the modal (primary action). Use this to archive existing quote options and return to product selection." [ref=e342]
+          - row "CHANGE_PRODUCT_CANCELLED Change product cancelled no payload Fired when the user cancels or dismisses the confirmation modal." [ref=e343]:
+            - cell "CHANGE_PRODUCT_CANCELLED" [ref=e344]:
+              - code [ref=e345]: CHANGE_PRODUCT_CANCELLED
+            - cell "Change product cancelled" [ref=e346]
+            - cell "no payload" [ref=e347]
+            - cell "Fired when the user cancels or dismisses the confirmation modal." [ref=e348]
+    - generic [ref=e349]:
+      - generic [ref=e350]:
+        - img [ref=e352]
+        - generic [ref=e354]:
+          - heading "Quote Versions Comparison" [level=2] [ref=e355]
+          - generic [ref=e356]:
+            - generic [ref=e357]: <x-gegis-library-quote-comparison>
+            - generic [ref=e358]: primitives
+            - generic [ref=e359]: 3 props
+            - generic [ref=e360]: 2 events
+      - paragraph [ref=e361]: "A custom comparison grid: each version (v1/v2/v3 — records from the same table) is a column; fields grouped by section are rows. Handles tick/cross, currency, aggregation, pills, percentage, and trend. Driven by a JSON array."
+      - paragraph [ref=e362]:
+        - strong [ref=e363]: "Standard components used:"
+        - text: none — fully custom
+      - figure "Sample preview (local)." [ref=e364]:
+        - img "Quote Versions Comparison preview"
+        - generic [ref=e365]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e366]
+      - table [ref=e367]:
+        - rowgroup [ref=e368]:
+          - row "Property Label Type Default Description" [ref=e369]:
+            - columnheader "Property" [ref=e370]
+            - columnheader "Label" [ref=e371]
+            - columnheader "Type" [ref=e372]
+            - columnheader "Default" [ref=e373]
+            - columnheader "Description" [ref=e374]
+        - rowgroup [ref=e375]:
+          - 'row "versions Versions (JSON array) json see sample ▾ Array of version objects, one per column. Each: { header:{title,option,status,selectable}, sections:[{sectionName,type,fields:[{label,value,displayType,formatted,...}]}], actions:[] }. The first version defines the rows; bind a data resource with your v1/v2/v3 records." [ref=e376]':
+            - cell "versions" [ref=e377]:
+              - code [ref=e378]: versions
+            - cell "Versions (JSON array)" [ref=e379]
+            - cell "json" [ref=e380]
+            - cell "see sample ▾" [ref=e381]
+            - 'cell "Array of version objects, one per column. Each: { header:{title,option,status,selectable}, sections:[{sectionName,type,fields:[{label,value,displayType,formatted,...}]}], actions:[] }. The first version defines the rows; bind a data resource with your v1/v2/v3 records." [ref=e382]'
+          - row "title Title string Quote Versions Comparison Fallback title shown if the first version has no header.title." [ref=e383]:
+            - cell "title" [ref=e384]:
+              - code [ref=e385]: title
+            - cell "Title" [ref=e386]
+            - cell "string" [ref=e387]
+            - cell "Quote Versions Comparison" [ref=e388]:
+              - code [ref=e389]: Quote Versions Comparison
+            - cell "Fallback title shown if the first version has no header.title." [ref=e390]
+          - row "labelWidth Label column width string 200px CSS width of the left (field-label) column, e.g. 200px or 16rem." [ref=e391]:
+            - cell "labelWidth" [ref=e392]:
+              - code [ref=e393]: labelWidth
+            - cell "Label column width" [ref=e394]
+            - cell "string" [ref=e395]
+            - cell "200px" [ref=e396]:
+              - code [ref=e397]: 200px
+            - cell "CSS width of the left (field-label) column, e.g. 200px or 16rem." [ref=e398]
+      - heading "Events" [level=3] [ref=e399]
+      - table [ref=e400]:
+        - rowgroup [ref=e401]:
+          - row "Event Label Payload When / use" [ref=e402]:
+            - columnheader "Event" [ref=e403]
+            - columnheader "Label" [ref=e404]
+            - columnheader "Payload" [ref=e405]
+            - columnheader "When / use" [ref=e406]
+        - rowgroup [ref=e407]:
+          - 'row "VERSION_SELECTED Version selected index:number checked:boolean Fired when a column''s Select checkbox changes. Payload: { index, checked }." [ref=e408]':
+            - cell "VERSION_SELECTED" [ref=e409]:
+              - code [ref=e410]: VERSION_SELECTED
+            - cell "Version selected" [ref=e411]
+            - cell "index:number checked:boolean" [ref=e412]:
+              - code [ref=e413]: index
+              - text: :number
+              - code [ref=e414]: checked
+              - text: :boolean
+            - 'cell "Fired when a column''s Select checkbox changes. Payload: { index, checked }." [ref=e415]'
+          - 'row "ACTION_CLICKED Action clicked index:number action:string Fired when a footer action button is clicked. Payload: { index, action }." [ref=e416]':
+            - cell "ACTION_CLICKED" [ref=e417]:
+              - code [ref=e418]: ACTION_CLICKED
+            - cell "Action clicked" [ref=e419]
+            - cell "index:number action:string" [ref=e420]:
+              - code [ref=e421]: index
+              - text: :number
+              - code [ref=e422]: action
+              - text: :string
+            - 'cell "Fired when a footer action button is clicked. Payload: { index, action }." [ref=e423]'
+      - heading "Sample input JSON" [level=3] [ref=e424]
+      - heading "versions sample" [level=4] [ref=e425]:
+        - code [ref=e426]: versions
+        - text: sample
+      - generic [ref=e427]:
+        - button "Copy" [ref=e428] [cursor=pointer]
+        - code [ref=e430]: "[ { \"header\": { \"title\": \"Quote Versions Comparison\", \"option\": \"Version 1\", \"status\": { \"label\": \"Current\", \"color\": \"gray\" }, \"selectable\": true }, \"sections\": [ { \"sectionName\": \"Overview\", \"type\": \"header_summary\", \"fields\": [ { \"label\": \"Effective date\", \"value\": \"2026-07-01\", \"displayType\": \"text\", \"formatted\": \"Jul 1, 2026\" }, { \"label\": \"AI recommended\", \"value\": false, \"displayType\": \"tick_cross\" } ] }, { \"sectionName\": \"Coverage\", \"type\": \"coverage\", \"fields\": [ { \"label\": \"Property Damage\", \"value\": true, \"displayType\": \"tick_cross\" }, { \"label\": \"Business Interruption\", \"value\": true, \"displayType\": \"tick_cross\" }, { \"label\": \"Flood\", \"value\": false, \"displayType\": \"tick_cross\" } ] }, { \"sectionName\": \"Premium\", \"type\": \"premium\", \"fields\": [ { \"label\": \"Total Annual Premium\", \"value\": 45100, \"displayType\": \"currency_bold\", \"isAggregation\": true, \"formatted\": \"$45,100\" } ] } ], \"actions\": [ { \"label\": \"Select\", \"style\": \"primary\" } ] }, { \"header\": { \"option\": \"Version 2\", \"status\": { \"label\": \"Recommended\", \"color\": \"green\" }, \"selectable\": true }, \"sections\": [ { \"sectionName\": \"Overview\", \"type\": \"header_summary\", \"fields\": [ { \"label\": \"Effective date\", \"value\": \"2026-07-01\", \"displayType\": \"text\", \"formatted\": \"Jul 1, 2026\" }, { \"label\": \"AI recommended\", \"value\": true, \"displayType\": \"tick_cross\" } ] }, { \"sectionName\": \"Coverage\", \"type\": \"coverage\", \"fields\": [ { \"label\": \"Property Damage\", \"value\": true, \"displayType\": \"tick_cross\" }, { \"label\": \"Business Interruption\", \"value\": true, \"displayType\": \"tick_cross\" }, { \"label\": \"Flood\", \"value\": true, \"displayType\": \"tick_cross\" } ] }, { \"sectionName\": \"Premium\", \"type\": \"premium\", \"fields\": [ { \"label\": \"Total Annual Premium\", \"value\": 51000, \"displayType\": \"currency_bold\", \"isAggregation\": true, \"formatted\": \"$51,000\", \"trend\": { \"direction\": \"increase\", \"vsBaseline\": { \"formatted\": \"+$5,900\", \"color\": \"red\" } } } ] } ], \"actions\": [ { \"label\": \"Select\", \"style\": \"primary\" } ] } ]"
+    - generic [ref=e431]:
+      - generic [ref=e432]:
+        - img [ref=e434]
+        - generic [ref=e440]:
+          - heading "Quote Options Action Bar" [level=2] [ref=e441]
+          - generic [ref=e442]:
+            - generic [ref=e443]: <x-gegis-library-quote-action-bar>
+            - generic [ref=e444]: primitives
+            - generic [ref=e445]: 11 props
+            - generic [ref=e446]: 4 events
+      - paragraph [ref=e447]: "Action bar for quote options: Select All + selected count, Approve Selected and Share to Broker (enabled when 1+ selected), and an always-on Generate New Option. Holds the selection and emits events. Composes now-button + now-icon."
+      - paragraph [ref=e448]:
+        - strong [ref=e449]: "Standard components used:"
+        - generic [ref=e450]: now-button
+        - generic [ref=e451]: now-icon
+      - figure "Sample preview (local)." [ref=e452]:
+        - img "Quote Options Action Bar preview"
+        - generic [ref=e453]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e454]
+      - table [ref=e455]:
+        - rowgroup [ref=e456]:
+          - row "Property Label Type Default Description" [ref=e457]:
+            - columnheader "Property" [ref=e458]
+            - columnheader "Label" [ref=e459]
+            - columnheader "Type" [ref=e460]
+            - columnheader "Default" [ref=e461]
+            - columnheader "Description" [ref=e462]
+        - rowgroup [ref=e463]:
+          - 'row "options Quote options json see sample ▾ The quote options. An object with an `items` array of { id, label }. The count shows X of items.length; Select All selects all their ids. (Object-wrapped — a bare top-level array default breaks the production build.)" [ref=e464]':
+            - cell "options" [ref=e465]:
+              - code [ref=e466]: options
+            - cell "Quote options" [ref=e467]
+            - cell "json" [ref=e468]
+            - cell "see sample ▾" [ref=e469]
+            - 'cell "The quote options. An object with an `items` array of { id, label }. The count shows X of items.length; Select All selects all their ids. (Object-wrapped — a bare top-level array default breaks the production build.)" [ref=e470]'
+          - 'row "selectedIds Selected ids json see sample ▾ Initial / externally-bound selection. An object with an `ids` array. Select All updates the selection internally from here." [ref=e471]':
+            - cell "selectedIds" [ref=e472]:
+              - code [ref=e473]: selectedIds
+            - cell "Selected ids" [ref=e474]
+            - cell "json" [ref=e475]
+            - cell "see sample ▾" [ref=e476]
+            - 'cell "Initial / externally-bound selection. An object with an `ids` array. Select All updates the selection internally from here." [ref=e477]'
+          - row "showCount Show selected count boolean true When on, shows \"X of N selected\" next to Select All." [ref=e478]:
+            - cell "showCount" [ref=e479]:
+              - code [ref=e480]: showCount
+            - cell "Show selected count" [ref=e481]
+            - cell "boolean" [ref=e482]
+            - cell "true" [ref=e483]:
+              - code [ref=e484]: "true"
+            - cell "When on, shows \"X of N selected\" next to Select All." [ref=e485]
+          - row "selectAllLabel Select All label string Select All Label for the select-all button." [ref=e486]:
+            - cell "selectAllLabel" [ref=e487]:
+              - code [ref=e488]: selectAllLabel
+            - cell "Select All label" [ref=e489]
+            - cell "string" [ref=e490]
+            - cell "Select All" [ref=e491]:
+              - code [ref=e492]: Select All
+            - cell "Label for the select-all button." [ref=e493]
+          - row "deselectAllLabel Deselect All label string Deselect All Label shown on the select-all button when everything is already selected (toggles to clear). Set equal to Select All label to keep it constant." [ref=e494]:
+            - cell "deselectAllLabel" [ref=e495]:
+              - code [ref=e496]: deselectAllLabel
+            - cell "Deselect All label" [ref=e497]
+            - cell "string" [ref=e498]
+            - cell "Deselect All" [ref=e499]:
+              - code [ref=e500]: Deselect All
+            - cell "Label shown on the select-all button when everything is already selected (toggles to clear). Set equal to Select All label to keep it constant." [ref=e501]
+          - row "approveLabel Approve button label string Approve Selected Label for the Approve Selected action." [ref=e502]:
+            - cell "approveLabel" [ref=e503]:
+              - code [ref=e504]: approveLabel
+            - cell "Approve button label" [ref=e505]
+            - cell "string" [ref=e506]
+            - cell "Approve Selected" [ref=e507]:
+              - code [ref=e508]: Approve Selected
+            - cell "Label for the Approve Selected action." [ref=e509]
+          - row "shareLabel Share button label string Share to Broker Label for the Share to Broker action." [ref=e510]:
+            - cell "shareLabel" [ref=e511]:
+              - code [ref=e512]: shareLabel
+            - cell "Share button label" [ref=e513]
+            - cell "string" [ref=e514]
+            - cell "Share to Broker" [ref=e515]:
+              - code [ref=e516]: Share to Broker
+            - cell "Label for the Share to Broker action." [ref=e517]
+          - row "generateLabel Generate button label string Generate New Option Label for the always-enabled Generate New Option action." [ref=e518]:
+            - cell "generateLabel" [ref=e519]:
+              - code [ref=e520]: generateLabel
+            - cell "Generate button label" [ref=e521]
+            - cell "string" [ref=e522]
+            - cell "Generate New Option" [ref=e523]:
+              - code [ref=e524]: Generate New Option
+            - cell "Label for the always-enabled Generate New Option action." [ref=e525]
+          - row "approveIcon Approve icon string circle-check-outline now-icon name for the Approve Selected button. Leave empty for no icon." [ref=e526]:
+            - cell "approveIcon" [ref=e527]:
+              - code [ref=e528]: approveIcon
+            - cell "Approve icon" [ref=e529]
+            - cell "string" [ref=e530]
+            - cell "circle-check-outline" [ref=e531]:
+              - code [ref=e532]: circle-check-outline
+            - cell "now-icon name for the Approve Selected button. Leave empty for no icon." [ref=e533]
+          - row "shareIcon Share icon string share-outline now-icon name for the Share to Broker button. Leave empty for no icon." [ref=e534]:
+            - cell "shareIcon" [ref=e535]:
+              - code [ref=e536]: shareIcon
+            - cell "Share icon" [ref=e537]
+            - cell "string" [ref=e538]
+            - cell "share-outline" [ref=e539]:
+              - code [ref=e540]: share-outline
+            - cell "now-icon name for the Share to Broker button. Leave empty for no icon." [ref=e541]
+          - row "generateIcon Generate icon string plus-outline now-icon name for the Generate New Option button. Leave empty for no icon." [ref=e542]:
+            - cell "generateIcon" [ref=e543]:
+              - code [ref=e544]: generateIcon
+            - cell "Generate icon" [ref=e545]
+            - cell "string" [ref=e546]
+            - cell "plus-outline" [ref=e547]:
+              - code [ref=e548]: plus-outline
+            - cell "now-icon name for the Generate New Option button. Leave empty for no icon." [ref=e549]
+      - heading "Events" [level=3] [ref=e550]
+      - table [ref=e551]:
+        - rowgroup [ref=e552]:
+          - row "Event Label Payload When / use" [ref=e553]:
+            - columnheader "Event" [ref=e554]
+            - columnheader "Label" [ref=e555]
+            - columnheader "Payload" [ref=e556]
+            - columnheader "When / use" [ref=e557]
+        - rowgroup [ref=e558]:
+          - 'row "SELECTION_CHANGED Selection changed selected:json count:number Fired when Select All toggles the selection. Payload: { selected:[ids], count }." [ref=e559]':
+            - cell "SELECTION_CHANGED" [ref=e560]:
+              - code [ref=e561]: SELECTION_CHANGED
+            - cell "Selection changed" [ref=e562]
+            - cell "selected:json count:number" [ref=e563]:
+              - code [ref=e564]: selected
+              - text: :json
+              - code [ref=e565]: count
+              - text: :number
+            - 'cell "Fired when Select All toggles the selection. Payload: { selected:[ids], count }." [ref=e566]'
+          - 'row "APPROVE_SELECTED Approve selected selected:json Fired when Approve Selected is clicked (only when 1+ selected). Payload: { selected:[ids] }." [ref=e567]':
+            - cell "APPROVE_SELECTED" [ref=e568]:
+              - code [ref=e569]: APPROVE_SELECTED
+            - cell "Approve selected" [ref=e570]
+            - cell "selected:json" [ref=e571]:
+              - code [ref=e572]: selected
+              - text: :json
+            - 'cell "Fired when Approve Selected is clicked (only when 1+ selected). Payload: { selected:[ids] }." [ref=e573]'
+          - 'row "SHARE_TO_BROKER Share to broker selected:json Fired when Share to Broker is clicked (only when 1+ selected). Payload: { selected:[ids] }." [ref=e574]':
+            - cell "SHARE_TO_BROKER" [ref=e575]:
+              - code [ref=e576]: SHARE_TO_BROKER
+            - cell "Share to broker" [ref=e577]
+            - cell "selected:json" [ref=e578]:
+              - code [ref=e579]: selected
+              - text: :json
+            - 'cell "Fired when Share to Broker is clicked (only when 1+ selected). Payload: { selected:[ids] }." [ref=e580]'
+          - row "GENERATE_NEW_OPTION Generate new option no payload Fired when Generate New Option is clicked (always enabled)." [ref=e581]:
+            - cell "GENERATE_NEW_OPTION" [ref=e582]:
+              - code [ref=e583]: GENERATE_NEW_OPTION
+            - cell "Generate new option" [ref=e584]
+            - cell "no payload" [ref=e585]
+            - cell "Fired when Generate New Option is clicked (always enabled)." [ref=e586]
+      - heading "Sample input JSON" [level=3] [ref=e587]
+      - heading "options" [level=4] [ref=e588]:
+        - code [ref=e589]: options
+      - generic [ref=e590]:
+        - button "Copy" [ref=e591] [cursor=pointer]
+        - code [ref=e593]: "{ \"items\": [ { \"id\": \"opt1\", \"label\": \"Option 1 v: 1.0\" }, { \"id\": \"opt2\", \"label\": \"Option 2 v: 2.3\" }, { \"id\": \"opt3\", \"label\": \"Option 3 v: 3.0\" }, { \"id\": \"opt4\", \"label\": \"Option 4 v: 1.0\" } ] }"
+      - heading "selectedIds" [level=4] [ref=e594]:
+        - code [ref=e595]: selectedIds
+      - generic [ref=e596]:
+        - button "Copy" [ref=e597] [cursor=pointer]
+        - code [ref=e599]: "{ \"ids\": [] }"
+    - generic [ref=e600]:
+      - generic [ref=e601]:
+        - img [ref=e603]
+        - generic [ref=e609]:
+          - heading "Peril-Specific Deductibles" [level=2] [ref=e610]
+          - generic [ref=e611]:
+            - generic [ref=e612]: <x-gegis-library-peril-deductibles>
+            - generic [ref=e613]: primitives
+            - generic [ref=e614]: 5 props
+            - generic [ref=e615]: 1 events
+      - paragraph [ref=e616]: A collapsible card that lists perils, each with an override toggle, a value, and a unit (e.g. % TIV). Composed entirely of standard now-* components.
+      - paragraph [ref=e617]:
+        - strong [ref=e618]: "Standard components used:"
+        - generic [ref=e619]: now-card
+        - generic [ref=e620]: now-card-divider
+        - generic [ref=e621]: now-icon
+        - generic [ref=e622]: now-highlighted-value
+        - generic [ref=e623]: now-toggle
+        - generic [ref=e624]: now-input
+        - generic [ref=e625]: now-dropdown
+      - figure "Sample preview (local)." [ref=e626]:
+        - img "Peril-Specific Deductibles preview"
+        - generic [ref=e627]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e628]
+      - table [ref=e629]:
+        - rowgroup [ref=e630]:
+          - row "Property Label Type Default Description" [ref=e631]:
+            - columnheader "Property" [ref=e632]
+            - columnheader "Label" [ref=e633]
+            - columnheader "Type" [ref=e634]
+            - columnheader "Default" [ref=e635]
+            - columnheader "Description" [ref=e636]
+        - rowgroup [ref=e637]:
+          - row "title Title string Peril-Specific Deductibles Heading shown in the card header." [ref=e638]:
+            - cell "title" [ref=e639]:
+              - code [ref=e640]: title
+            - cell "Title" [ref=e641]
+            - cell "string" [ref=e642]
+            - cell "Peril-Specific Deductibles" [ref=e643]:
+              - code [ref=e644]: Peril-Specific Deductibles
+            - cell "Heading shown in the card header." [ref=e645]
+          - row "expanded Expanded boolean true When on, the list of perils is shown. The header chevron toggles this at runtime." [ref=e646]:
+            - cell "expanded" [ref=e647]:
+              - code [ref=e648]: expanded
+            - cell "Expanded" [ref=e649]
+            - cell "boolean" [ref=e650]
+            - cell "true" [ref=e651]:
+              - code [ref=e652]: "true"
+            - cell "When on, the list of perils is shown. The header chevron toggles this at runtime." [ref=e653]
+          - row "showOverrideCount Show override count boolean true When on, the header shows how many perils currently have their override toggle enabled (e.g. \"3 overrides applied\")." [ref=e654]:
+            - cell "showOverrideCount" [ref=e655]:
+              - code [ref=e656]: showOverrideCount
+            - cell "Show override count" [ref=e657]
+            - cell "boolean" [ref=e658]
+            - cell "true" [ref=e659]:
+              - code [ref=e660]: "true"
+            - cell "When on, the header shows how many perils currently have their override toggle enabled (e.g. \"3 overrides applied\")." [ref=e661]
+          - 'row "unitOptions Unit options json see sample ▾ Choices offered by each row''s unit dropdown. An object with an `items` array of { id, label }." [ref=e662]':
+            - cell "unitOptions" [ref=e663]:
+              - code [ref=e664]: unitOptions
+            - cell "Unit options" [ref=e665]
+            - cell "json" [ref=e666]
+            - cell "see sample ▾" [ref=e667]
+            - 'cell "Choices offered by each row''s unit dropdown. An object with an `items` array of { id, label }." [ref=e668]'
+          - 'row "perils Perils json see sample ▾ The list of perils. An object with an `items` array; each item: { id, name, required, zone, defaultText, enabled, value, unit }. (Wrapped in an object — a bare top-level array default breaks the production build.)" [ref=e669]':
+            - cell "perils" [ref=e670]:
+              - code [ref=e671]: perils
+            - cell "Perils" [ref=e672]
+            - cell "json" [ref=e673]
+            - cell "see sample ▾" [ref=e674]
+            - 'cell "The list of perils. An object with an `items` array; each item: { id, name, required, zone, defaultText, enabled, value, unit }. (Wrapped in an object — a bare top-level array default breaks the production build.)" [ref=e675]'
+      - heading "Events" [level=3] [ref=e676]
+      - table [ref=e677]:
+        - rowgroup [ref=e678]:
+          - row "Event Label Payload When / use" [ref=e679]:
+            - columnheader "Event" [ref=e680]
+            - columnheader "Label" [ref=e681]
+            - columnheader "Payload" [ref=e682]
+            - columnheader "When / use" [ref=e683]
+        - rowgroup [ref=e684]:
+          - 'row "PERIL_DEDUCTIBLE_CHANGED Peril deductible changed id:string name:string enabled:boolean value:string unit:string Fired when a row''s override toggle, value, or unit changes. Payload: { id, name, enabled, value, unit }." [ref=e685]':
+            - cell "PERIL_DEDUCTIBLE_CHANGED" [ref=e686]:
+              - code [ref=e687]: PERIL_DEDUCTIBLE_CHANGED
+            - cell "Peril deductible changed" [ref=e688]
+            - cell "id:string name:string enabled:boolean value:string unit:string" [ref=e689]:
+              - code [ref=e690]: id
+              - text: :string
+              - code [ref=e691]: name
+              - text: :string
+              - code [ref=e692]: enabled
+              - text: :boolean
+              - code [ref=e693]: value
+              - text: :string
+              - code [ref=e694]: unit
+              - text: :string
+            - 'cell "Fired when a row''s override toggle, value, or unit changes. Payload: { id, name, enabled, value, unit }." [ref=e695]'
+      - heading "Sample input JSON" [level=3] [ref=e696]
+      - heading "unitOptions" [level=4] [ref=e697]:
+        - code [ref=e698]: unitOptions
+      - generic [ref=e699]:
+        - button "Copy" [ref=e700] [cursor=pointer]
+        - code [ref=e702]: "{ \"items\": [ { \"id\": \"pct_tiv\", \"label\": \"% TIV\" }, { \"id\": \"amount\", \"label\": \"$ Amount\" }, { \"id\": \"pct_limit\", \"label\": \"% Limit\" } ] }"
+      - heading "perils" [level=4] [ref=e703]:
+        - code [ref=e704]: perils
+      - generic [ref=e705]:
+        - button "Copy" [ref=e706] [cursor=pointer]
+        - code [ref=e708]: "{ \"items\": [ { \"id\": \"wind\", \"name\": \"Wind / Hurricane\", \"required\": true, \"zone\": \"Coastal Zone\", \"defaultText\": \"Default: 2% of TIV\", \"enabled\": true, \"value\": \"2\", \"unit\": \"pct_tiv\" }, { \"id\": \"flood\", \"name\": \"Flood\", \"required\": true, \"zone\": \"Flood Zone A\", \"defaultText\": \"Default: 5% of TIV\", \"enabled\": true, \"value\": \"5\", \"unit\": \"pct_tiv\" }, { \"id\": \"earthquake\", \"name\": \"Earthquake\", \"required\": false, \"zone\": \"\", \"defaultText\": \"Default: 10% of TIV\", \"enabled\": false, \"value\": \"10\", \"unit\": \"pct_tiv\" }, { \"id\": \"hail\", \"name\": \"Hail\", \"required\": false, \"zone\": \"\", \"defaultText\": \"Default: 1% of TIV\", \"enabled\": true, \"value\": \"1\", \"unit\": \"pct_tiv\" } ] }"
+    - generic [ref=e709]:
+      - generic [ref=e710]:
+        - img [ref=e712]
+        - generic [ref=e717]:
+          - heading "Dashboard Metric Card" [level=2] [ref=e718]
+          - generic [ref=e719]:
+            - generic [ref=e720]: <x-gegis-library-metric-card>
+            - generic [ref=e721]: primitives
+            - generic [ref=e722]: 14 props
+            - generic [ref=e723]: 1 events
+      - paragraph [ref=e724]: "A configurable KPI card: icon, heading, formatted value, and a trend pill (e.g. ↓ 4.2% MoM)."
+      - paragraph [ref=e725]:
+        - strong [ref=e726]: "Standard components used:"
+        - generic [ref=e727]: now-card
+        - generic [ref=e728]: now-icon
+      - figure "Sample preview (local)." [ref=e729]:
+        - img "Dashboard Metric Card preview"
+        - generic [ref=e730]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e731]
+      - table [ref=e732]:
+        - rowgroup [ref=e733]:
+          - row "Property Label Type Default Description" [ref=e734]:
+            - columnheader "Property" [ref=e735]
+            - columnheader "Label" [ref=e736]
+            - columnheader "Type" [ref=e737]
+            - columnheader "Default" [ref=e738]
+            - columnheader "Description" [ref=e739]
+        - rowgroup [ref=e740]:
+          - row "heading Heading string Submissions to Quote Ratio Title shown above the value." [ref=e741]:
+            - cell "heading" [ref=e742]:
+              - code [ref=e743]: heading
+            - cell "Heading" [ref=e744]
+            - cell "string" [ref=e745]
+            - cell "Submissions to Quote Ratio" [ref=e746]:
+              - code [ref=e747]: Submissions to Quote Ratio
+            - cell "Title shown above the value." [ref=e748]
+          - row "iconGlyph Icon glyph string $ A literal glyph for the icon tile (text or emoji, e.g. $ or 📈). Always renders. Takes precedence over Icon. Leave empty to use a now-icon, or to hide the tile." [ref=e749]:
+            - cell "iconGlyph" [ref=e750]:
+              - code [ref=e751]: iconGlyph
+            - cell "Icon glyph" [ref=e752]
+            - cell "string" [ref=e753]
+            - cell "$" [ref=e754]:
+              - code [ref=e755]: $
+            - cell "A literal glyph for the icon tile (text or emoji, e.g. $ or 📈). Always renders. Takes precedence over Icon. Leave empty to use a now-icon, or to hide the tile." [ref=e756]
+          - row "icon Icon (now-icon) string now-icon glyph name (e.g. currency-dollar-outline, chart-line-outline). Used only when Icon glyph is empty. Resolves from the instance icon library, so may render blank in a disconnected local preview." [ref=e757]:
+            - cell "icon" [ref=e758]:
+              - code [ref=e759]: icon
+            - cell "Icon (now-icon)" [ref=e760]
+            - cell "string" [ref=e761]
+            - cell [ref=e762]:
+              - code [ref=e763]
+            - cell "now-icon glyph name (e.g. currency-dollar-outline, chart-line-outline). Used only when Icon glyph is empty. Resolves from the instance icon library, so may render blank in a disconnected local preview." [ref=e764]
+          - row "value Value string 25 The headline metric. A number or numeric string; formatted per the Value format property." [ref=e765]:
+            - cell "value" [ref=e766]:
+              - code [ref=e767]: value
+            - cell "Value" [ref=e768]
+            - cell "string" [ref=e769]
+            - cell "25" [ref=e770]:
+              - code [ref=e771]: "25"
+            - cell "The headline metric. A number or numeric string; formatted per the Value format property." [ref=e772]
+          - row "format Value format choice (percent · currency · number · none) percent How the value is rendered." [ref=e773]:
+            - cell "format" [ref=e774]:
+              - code [ref=e775]: format
+            - cell "Value format" [ref=e776]
+            - cell "choice (percent · currency · number · none)" [ref=e777]
+            - cell "percent" [ref=e778]:
+              - code [ref=e779]: percent
+            - cell "How the value is rendered." [ref=e780]
+          - row "decimals Decimal places number 2 Decimal places for the value and trend magnitude." [ref=e781]:
+            - cell "decimals" [ref=e782]:
+              - code [ref=e783]: decimals
+            - cell "Decimal places" [ref=e784]
+            - cell "number" [ref=e785]
+            - cell "2" [ref=e786]:
+              - code [ref=e787]: "2"
+            - cell "Decimal places for the value and trend magnitude." [ref=e788]
+          - row "currencySymbol Currency symbol string $ Prefix used when Value format is Currency." [ref=e789]:
+            - cell "currencySymbol" [ref=e790]:
+              - code [ref=e791]: currencySymbol
+            - cell "Currency symbol" [ref=e792]
+            - cell "string" [ref=e793]
+            - cell "$" [ref=e794]:
+              - code [ref=e795]: $
+            - cell "Prefix used when Value format is Currency." [ref=e796]
+          - row "trendValue Trend value string -4.2 Change vs the previous period. The sign sets the arrow direction (auto); the magnitude is shown. Leave empty to hide the trend pill." [ref=e797]:
+            - cell "trendValue" [ref=e798]:
+              - code [ref=e799]: trendValue
+            - cell "Trend value" [ref=e800]
+            - cell "string" [ref=e801]
+            - cell "-4.2" [ref=e802]:
+              - code [ref=e803]: "-4.2"
+            - cell "Change vs the previous period. The sign sets the arrow direction (auto); the magnitude is shown. Leave empty to hide the trend pill." [ref=e804]
+          - row "trendDirection Trend direction choice (auto · up · down · flat) auto Arrow direction. Auto derives it from the sign of the trend value." [ref=e805]:
+            - cell "trendDirection" [ref=e806]:
+              - code [ref=e807]: trendDirection
+            - cell "Trend direction" [ref=e808]
+            - cell "choice (auto · up · down · flat)" [ref=e809]
+            - cell "auto" [ref=e810]:
+              - code [ref=e811]: auto
+            - cell "Arrow direction. Auto derives it from the sign of the trend value." [ref=e812]
+          - row "trendPeriod Trend period string MoM Caption beside the pill, e.g. MoM, YoY, vs last week." [ref=e813]:
+            - cell "trendPeriod" [ref=e814]:
+              - code [ref=e815]: trendPeriod
+            - cell "Trend period" [ref=e816]
+            - cell "string" [ref=e817]
+            - cell "MoM" [ref=e818]:
+              - code [ref=e819]: MoM
+            - cell "Caption beside the pill, e.g. MoM, YoY, vs last week." [ref=e820]
+          - row "trendPositiveIsGood Increase is positive boolean true When on, an upward trend is green and downward is red. Turn off for lower-is-better metrics (cost, churn, latency)." [ref=e821]:
+            - cell "trendPositiveIsGood" [ref=e822]:
+              - code [ref=e823]: trendPositiveIsGood
+            - cell "Increase is positive" [ref=e824]
+            - cell "boolean" [ref=e825]
+            - cell "true" [ref=e826]:
+              - code [ref=e827]: "true"
+            - cell "When on, an upward trend is green and downward is red. Turn off for lower-is-better metrics (cost, churn, latency)." [ref=e828]
+          - row "iconColor Icon color string Optional CSS color for the icon glyph. Empty uses the theme default." [ref=e829]:
+            - cell "iconColor" [ref=e830]:
+              - code [ref=e831]: iconColor
+            - cell "Icon color" [ref=e832]
+            - cell "string" [ref=e833]
+            - cell [ref=e834]:
+              - code [ref=e835]
+            - cell "Optional CSS color for the icon glyph. Empty uses the theme default." [ref=e836]
+          - row "iconBackgroundColor Icon background color string Optional CSS color for the icon tile background. Empty uses the theme default." [ref=e837]:
+            - cell "iconBackgroundColor" [ref=e838]:
+              - code [ref=e839]: iconBackgroundColor
+            - cell "Icon background color" [ref=e840]
+            - cell "string" [ref=e841]
+            - cell [ref=e842]:
+              - code [ref=e843]
+            - cell "Optional CSS color for the icon tile background. Empty uses the theme default." [ref=e844]
+          - row "clickable Clickable boolean false When on, the card is focusable and emits a 'Metric card clicked' event." [ref=e845]:
+            - cell "clickable" [ref=e846]:
+              - code [ref=e847]: clickable
+            - cell "Clickable" [ref=e848]
+            - cell "boolean" [ref=e849]
+            - cell "false" [ref=e850]:
+              - code [ref=e851]: "false"
+            - cell "When on, the card is focusable and emits a 'Metric card clicked' event." [ref=e852]
+      - heading "Events" [level=3] [ref=e853]
+      - table [ref=e854]:
+        - rowgroup [ref=e855]:
+          - row "Event Label Payload When / use" [ref=e856]:
+            - columnheader "Event" [ref=e857]
+            - columnheader "Label" [ref=e858]
+            - columnheader "Payload" [ref=e859]
+            - columnheader "When / use" [ref=e860]
+        - rowgroup [ref=e861]:
+          - 'row "METRIC_CARD_CLICKED Metric card clicked heading:string value:string Fired when a clickable card is activated by click or keyboard. Payload: { heading, value }." [ref=e862]':
+            - cell "METRIC_CARD_CLICKED" [ref=e863]:
+              - code [ref=e864]: METRIC_CARD_CLICKED
+            - cell "Metric card clicked" [ref=e865]
+            - cell "heading:string value:string" [ref=e866]:
+              - code [ref=e867]: heading
+              - text: :string
+              - code [ref=e868]: value
+              - text: :string
+            - 'cell "Fired when a clickable card is activated by click or keyboard. Payload: { heading, value }." [ref=e869]'
+    - generic [ref=e870]:
+      - generic [ref=e871]:
+        - img [ref=e873]
+        - generic [ref=e877]:
+          - heading "Collapse / Expand Panel" [level=2] [ref=e878]
+          - generic [ref=e879]:
+            - generic [ref=e880]: <x-gegis-library-collapse>
+            - generic [ref=e881]: primitives
+            - generic [ref=e882]: 9 props
+            - generic [ref=e883]: 0 events
+      - paragraph [ref=e884]: "A fully custom collapsible panel: a clickable header with a chevron or +/- trigger that shows or hides its content. Stack several to build an accordion."
+      - paragraph [ref=e885]:
+        - strong [ref=e886]: "Standard components used:"
+        - text: none — fully custom
+      - figure "Sample preview (local)." [ref=e887]:
+        - img "Collapse / Expand Panel preview"
+        - generic [ref=e888]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e889]
+      - table [ref=e890]:
+        - rowgroup [ref=e891]:
+          - row "Property Label Type Default Description" [ref=e892]:
+            - columnheader "Property" [ref=e893]
+            - columnheader "Label" [ref=e894]
+            - columnheader "Type" [ref=e895]
+            - columnheader "Default" [ref=e896]
+            - columnheader "Description" [ref=e897]
+        - rowgroup [ref=e898]:
+          - row "headingText Heading string Section title The label shown in the header. Selecting the header toggles the content." [ref=e899]:
+            - cell "headingText" [ref=e900]:
+              - code [ref=e901]: headingText
+            - cell "Heading" [ref=e902]
+            - cell "string" [ref=e903]
+            - cell "Section title" [ref=e904]:
+              - code [ref=e905]: Section title
+            - cell "The label shown in the header. Selecting the header toggles the content." [ref=e906]
+          - row "bodyText Body text string Place any content here. In UI Builder you can drop other components into this panel's slot; this text shows when the slot is empty. Fallback text shown in the content area when nothing is placed in the component's slot. Leave empty if you only want slotted content." [ref=e907]:
+            - cell "bodyText" [ref=e908]:
+              - code [ref=e909]: bodyText
+            - cell "Body text" [ref=e910]
+            - cell "string" [ref=e911]
+            - cell "Place any content here. In UI Builder you can drop other components into this panel's slot; this text shows when the slot is empty." [ref=e912]:
+              - code [ref=e913]: Place any content here. In UI Builder you can drop other components into this panel's slot; this text shows when the slot is empty.
+            - cell "Fallback text shown in the content area when nothing is placed in the component's slot. Leave empty if you only want slotted content." [ref=e914]
+          - row "expanded Expanded by default boolean false Whether the panel starts open when the page loads." [ref=e915]:
+            - cell "expanded" [ref=e916]:
+              - code [ref=e917]: expanded
+            - cell "Expanded by default" [ref=e918]
+            - cell "boolean" [ref=e919]
+            - cell "false" [ref=e920]:
+              - code [ref=e921]: "false"
+            - cell "Whether the panel starts open when the page loads." [ref=e922]
+          - row "triggerIcon Trigger icon choice (chevron · plusminus) chevron The icon that indicates open/closed state." [ref=e923]:
+            - cell "triggerIcon" [ref=e924]:
+              - code [ref=e925]: triggerIcon
+            - cell "Trigger icon" [ref=e926]
+            - cell "choice (chevron · plusminus)" [ref=e927]
+            - cell "chevron" [ref=e928]:
+              - code [ref=e929]: chevron
+            - cell "The icon that indicates open/closed state." [ref=e930]
+          - row "iconPosition Icon position choice (right · left) right Whether the trigger icon sits on the left or right of the heading." [ref=e931]:
+            - cell "iconPosition" [ref=e932]:
+              - code [ref=e933]: iconPosition
+            - cell "Icon position" [ref=e934]
+            - cell "choice (right · left)" [ref=e935]
+            - cell "right" [ref=e936]:
+              - code [ref=e937]: right
+            - cell "Whether the trigger icon sits on the left or right of the heading." [ref=e938]
+          - row "bordered Show border boolean false Optional. When on, the panel is wrapped in a rounded border/card. Off by default for the clean, flat look." [ref=e939]:
+            - cell "bordered" [ref=e940]:
+              - code [ref=e941]: bordered
+            - cell "Show border" [ref=e942]
+            - cell "boolean" [ref=e943]
+            - cell "false" [ref=e944]:
+              - code [ref=e945]: "false"
+            - cell "Optional. When on, the panel is wrapped in a rounded border/card. Off by default for the clean, flat look." [ref=e946]
+          - row "disabled Disabled boolean false When on, the header can't be toggled." [ref=e947]:
+            - cell "disabled" [ref=e948]:
+              - code [ref=e949]: disabled
+            - cell "Disabled" [ref=e950]
+            - cell "boolean" [ref=e951]
+            - cell "false" [ref=e952]:
+              - code [ref=e953]: "false"
+            - cell "When on, the header can't be toggled." [ref=e954]
+          - 'row "contentSizing Content sizing choice (grow · fixed) grow How the content area is sized. Grow to fit: the area grows with the content (use Content height as a minimum floor) — best for a Playbook. Fixed: exact height, scrolls inside." [ref=e955]':
+            - cell "contentSizing" [ref=e956]:
+              - code [ref=e957]: contentSizing
+            - cell "Content sizing" [ref=e958]
+            - cell "choice (grow · fixed)" [ref=e959]
+            - cell "grow" [ref=e960]:
+              - code [ref=e961]: grow
+            - 'cell "How the content area is sized. Grow to fit: the area grows with the content (use Content height as a minimum floor) — best for a Playbook. Fixed: exact height, scrolls inside." [ref=e962]'
+          - row "contentHeight Content height string 60vh A CSS length, e.g. 60vh or 500px. In Grow to fit mode it's the MINIMUM height (the area grows taller as needed). In Fixed mode it's the exact height. Required when embedding a component that sizes to its parent (like a Playbook), which otherwise renders at ~0 height." [ref=e963]:
+            - cell "contentHeight" [ref=e964]:
+              - code [ref=e965]: contentHeight
+            - cell "Content height" [ref=e966]
+            - cell "string" [ref=e967]
+            - cell "60vh" [ref=e968]:
+              - code [ref=e969]: 60vh
+            - cell "A CSS length, e.g. 60vh or 500px. In Grow to fit mode it's the MINIMUM height (the area grows taller as needed). In Fixed mode it's the exact height. Required when embedding a component that sizes to its parent (like a Playbook), which otherwise renders at ~0 height." [ref=e970]
+      - heading "Events" [level=3] [ref=e971]
+      - paragraph [ref=e972]: No external events — this component has no state an outside page needs to bind.
+    - generic [ref=e973]:
+      - generic [ref=e974]:
+        - img [ref=e976]
+        - generic [ref=e982]:
+          - heading "Dynamic Form" [level=2] [ref=e983]
+          - generic [ref=e984]:
+            - generic [ref=e985]: <x-gegis-library-dynamic-form>
+            - generic [ref=e986]: primitives
+            - generic [ref=e987]: 5 props
+            - generic [ref=e988]: 2 events
+      - paragraph [ref=e989]: "A metadata-driven sectioned form: section cards with a multi-column grid of select / text / read-only fields. Values bind to a record; Save fires FORM_SAVED for a REST data resource."
+      - paragraph [ref=e990]:
+        - strong [ref=e991]: "Standard components used:"
+        - text: none — fully custom
+      - figure "Sample preview (local)." [ref=e992]:
+        - img "Dynamic Form preview"
+        - generic [ref=e993]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e994]
+      - table [ref=e995]:
+        - rowgroup [ref=e996]:
+          - row "Property Label Type Default Description" [ref=e997]:
+            - columnheader "Property" [ref=e998]
+            - columnheader "Label" [ref=e999]
+            - columnheader "Type" [ref=e1000]
+            - columnheader "Default" [ref=e1001]
+            - columnheader "Description" [ref=e1002]
+        - rowgroup [ref=e1003]:
+          - 'row "sections Sections (JSON array) json see sample ▾ Grouping metadata. Each: { sectionName, fields:[{ label, name, type:''select''|''text'', options, placeholder, readonly, value }] }. Bind your external metadata here." [ref=e1004]':
+            - cell "sections" [ref=e1005]:
+              - code [ref=e1006]: sections
+            - cell "Sections (JSON array)" [ref=e1007]
+            - cell "json" [ref=e1008]
+            - cell "see sample ▾" [ref=e1009]
+            - 'cell "Grouping metadata. Each: { sectionName, fields:[{ label, name, type:''select''|''text'', options, placeholder, readonly, value }] }. Bind your external metadata here." [ref=e1010]'
+          - row "values Values (JSON object) json see sample ▾ Current field values keyed by field name. Bind your table record here; the form updates this as the user edits." [ref=e1011]:
+            - cell "values" [ref=e1012]:
+              - code [ref=e1013]: values
+            - cell "Values (JSON object)" [ref=e1014]
+            - cell "json" [ref=e1015]
+            - cell "see sample ▾" [ref=e1016]
+            - cell "Current field values keyed by field name. Bind your table record here; the form updates this as the user edits." [ref=e1017]
+          - row "columns Columns number 3 Number of fields per row in each section." [ref=e1018]:
+            - cell "columns" [ref=e1019]:
+              - code [ref=e1020]: columns
+            - cell "Columns" [ref=e1021]
+            - cell "number" [ref=e1022]
+            - cell "3" [ref=e1023]:
+              - code [ref=e1024]: "3"
+            - cell "Number of fields per row in each section." [ref=e1025]
+          - row "saveLabel Save button text string Save Label for the Save button." [ref=e1026]:
+            - cell "saveLabel" [ref=e1027]:
+              - code [ref=e1028]: saveLabel
+            - cell "Save button text" [ref=e1029]
+            - cell "string" [ref=e1030]
+            - cell "Save" [ref=e1031]:
+              - code [ref=e1032]: Save
+            - cell "Label for the Save button." [ref=e1033]
+          - row "showSave Show Save button boolean true When on, shows the Save button that fires FORM_SAVED." [ref=e1034]:
+            - cell "showSave" [ref=e1035]:
+              - code [ref=e1036]: showSave
+            - cell "Show Save button" [ref=e1037]
+            - cell "boolean" [ref=e1038]
+            - cell "true" [ref=e1039]:
+              - code [ref=e1040]: "true"
+            - cell "When on, shows the Save button that fires FORM_SAVED." [ref=e1041]
+      - heading "Events" [level=3] [ref=e1042]
+      - table [ref=e1043]:
+        - rowgroup [ref=e1044]:
+          - row "Event Label Payload When / use" [ref=e1045]:
+            - columnheader "Event" [ref=e1046]
+            - columnheader "Label" [ref=e1047]
+            - columnheader "Payload" [ref=e1048]
+            - columnheader "When / use" [ref=e1049]
+        - rowgroup [ref=e1050]:
+          - 'row "FIELD_CHANGED Field changed name:string value:string Fired when any field changes. Payload: { name, value }." [ref=e1051]':
+            - cell "FIELD_CHANGED" [ref=e1052]:
+              - code [ref=e1053]: FIELD_CHANGED
+            - cell "Field changed" [ref=e1054]
+            - cell "name:string value:string" [ref=e1055]:
+              - code [ref=e1056]: name
+              - text: :string
+              - code [ref=e1057]: value
+              - text: :string
+            - 'cell "Fired when any field changes. Payload: { name, value }." [ref=e1058]'
+          - 'row "FORM_SAVED Form saved values:json Fired when Save is clicked. Payload: { values }. Bind to a REST/transform data resource to perform the HTTP save." [ref=e1059]':
+            - cell "FORM_SAVED" [ref=e1060]:
+              - code [ref=e1061]: FORM_SAVED
+            - cell "Form saved" [ref=e1062]
+            - cell "values:json" [ref=e1063]:
+              - code [ref=e1064]: values
+              - text: :json
+            - 'cell "Fired when Save is clicked. Payload: { values }. Bind to a REST/transform data resource to perform the HTTP save." [ref=e1065]'
+      - heading "Sample input JSON" [level=3] [ref=e1066]
+      - heading "sections" [level=4] [ref=e1067]:
+        - code [ref=e1068]: sections
+      - generic [ref=e1069]:
+        - button "Copy" [ref=e1070] [cursor=pointer]
+        - code [ref=e1072]: "[]"
+      - heading "values" [level=4] [ref=e1073]:
+        - code [ref=e1074]: values
+      - generic [ref=e1075]:
+        - button "Copy" [ref=e1076] [cursor=pointer]
+        - code [ref=e1078]: "{}"
+    - generic [ref=e1079]:
+      - generic [ref=e1080]:
+        - img [ref=e1082]
+        - generic [ref=e1087]:
+          - heading "Endorsement Card" [level=2] [ref=e1088]
+          - generic [ref=e1089]:
+            - generic [ref=e1090]: <x-gegis-library-endorsement-card>
+            - generic [ref=e1091]: primitives
+            - generic [ref=e1092]: 8 props
+            - generic [ref=e1093]: 1 events
+      - paragraph [ref=e1094]: "A single endorsement/clause card: title, colored category pills, description, gray meta tags, and a required / add / remove action button. Drop several to build a clause library grid."
+      - paragraph [ref=e1095]:
+        - strong [ref=e1096]: "Standard components used:"
+        - text: none — fully custom
+      - figure "Sample preview (local)." [ref=e1097]:
+        - img "Endorsement Card preview"
+        - generic [ref=e1098]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e1099]
+      - table [ref=e1100]:
+        - rowgroup [ref=e1101]:
+          - row "Property Label Type Default Description" [ref=e1102]:
+            - columnheader "Property" [ref=e1103]
+            - columnheader "Label" [ref=e1104]
+            - columnheader "Type" [ref=e1105]
+            - columnheader "Default" [ref=e1106]
+            - columnheader "Description" [ref=e1107]
+        - rowgroup [ref=e1108]:
+          - row "title Title string Commercial General Liability Coverage Endorsement / clause name." [ref=e1109]:
+            - cell "title" [ref=e1110]:
+              - code [ref=e1111]: title
+            - cell "Title" [ref=e1112]
+            - cell "string" [ref=e1113]
+            - cell "Commercial General Liability Coverage" [ref=e1114]:
+              - code [ref=e1115]: Commercial General Liability Coverage
+            - cell "Endorsement / clause name." [ref=e1116]
+          - 'row "categoryTags Category pills (JSON array) json see sample ▾ Colored status/category pills. Each item: { label, color }. color = blue | red | green | purple | orange | gray." [ref=e1117]':
+            - cell "categoryTags" [ref=e1118]:
+              - code [ref=e1119]: categoryTags
+            - cell "Category pills (JSON array)" [ref=e1120]
+            - cell "json" [ref=e1121]
+            - cell "see sample ▾" [ref=e1122]
+            - 'cell "Colored status/category pills. Each item: { label, color }. color = blue | red | green | purple | orange | gray." [ref=e1123]'
+          - row "description Description string Short description shown under the pills." [ref=e1124]:
+            - cell "description" [ref=e1125]:
+              - code [ref=e1126]: description
+            - cell "Description" [ref=e1127]
+            - cell "string" [ref=e1128]
+            - cell [ref=e1129]:
+              - code [ref=e1130]
+            - cell "Short description shown under the pills." [ref=e1131]
+          - 'row "metaTags Meta tags (JSON array) json see sample ▾ Plain gray tags, e.g. Auto-applied, Suggested, Requires approval. Array of strings or { label }." [ref=e1132]':
+            - cell "metaTags" [ref=e1133]:
+              - code [ref=e1134]: metaTags
+            - cell "Meta tags (JSON array)" [ref=e1135]
+            - cell "json" [ref=e1136]
+            - cell "see sample ▾" [ref=e1137]
+            - 'cell "Plain gray tags, e.g. Auto-applied, Suggested, Requires approval. Array of strings or { label }." [ref=e1138]'
+          - row "actionType Action type choice (required · add · remove · none) required Which action button to show." [ref=e1139]:
+            - cell "actionType" [ref=e1140]:
+              - code [ref=e1141]: actionType
+            - cell "Action type" [ref=e1142]
+            - cell "choice (required · add · remove · none)" [ref=e1143]
+            - cell "required" [ref=e1144]:
+              - code [ref=e1145]: required
+            - cell "Which action button to show." [ref=e1146]
+          - row "actionLabel Action button text string Override the button text. Empty uses the default for the action type (Required / + Add / × Remove)." [ref=e1147]:
+            - cell "actionLabel" [ref=e1148]:
+              - code [ref=e1149]: actionLabel
+            - cell "Action button text" [ref=e1150]
+            - cell "string" [ref=e1151]
+            - cell [ref=e1152]:
+              - code [ref=e1153]
+            - cell "Override the button text. Empty uses the default for the action type (Required / + Add / × Remove)." [ref=e1154]
+          - row "collapsible Collapsible boolean false When on, the chevron toggles the card body. Off (default) shows everything; the chevron is decorative." [ref=e1155]:
+            - cell "collapsible" [ref=e1156]:
+              - code [ref=e1157]: collapsible
+            - cell "Collapsible" [ref=e1158]
+            - cell "boolean" [ref=e1159]
+            - cell "false" [ref=e1160]:
+              - code [ref=e1161]: "false"
+            - cell "When on, the chevron toggles the card body. Off (default) shows everything; the chevron is decorative." [ref=e1162]
+          - row "expanded Expanded boolean true When Collapsible is on, whether the body starts open." [ref=e1163]:
+            - cell "expanded" [ref=e1164]:
+              - code [ref=e1165]: expanded
+            - cell "Expanded" [ref=e1166]
+            - cell "boolean" [ref=e1167]
+            - cell "true" [ref=e1168]:
+              - code [ref=e1169]: "true"
+            - cell "When Collapsible is on, whether the body starts open." [ref=e1170]
+      - heading "Events" [level=3] [ref=e1171]
+      - table [ref=e1172]:
+        - rowgroup [ref=e1173]:
+          - row "Event Label Payload When / use" [ref=e1174]:
+            - columnheader "Event" [ref=e1175]
+            - columnheader "Label" [ref=e1176]
+            - columnheader "Payload" [ref=e1177]
+            - columnheader "When / use" [ref=e1178]
+        - rowgroup [ref=e1179]:
+          - 'row "ACTION_CLICKED Action clicked type:string Fired when Add or Remove is clicked (not for Required). Payload: { type }." [ref=e1180]':
+            - cell "ACTION_CLICKED" [ref=e1181]:
+              - code [ref=e1182]: ACTION_CLICKED
+            - cell "Action clicked" [ref=e1183]
+            - cell "type:string" [ref=e1184]:
+              - code [ref=e1185]: type
+              - text: :string
+            - 'cell "Fired when Add or Remove is clicked (not for Required). Payload: { type }." [ref=e1186]'
+      - heading "Sample input JSON" [level=3] [ref=e1187]
+      - heading "categoryTags" [level=4] [ref=e1188]:
+        - code [ref=e1189]: categoryTags
+      - generic [ref=e1190]:
+        - button "Copy" [ref=e1191] [cursor=pointer]
+        - code [ref=e1193]: "[]"
+      - heading "metaTags" [level=4] [ref=e1194]:
+        - code [ref=e1195]: metaTags
+      - generic [ref=e1196]:
+        - button "Copy" [ref=e1197] [cursor=pointer]
+        - code [ref=e1199]: "[]"
+    - generic [ref=e1200]:
+      - generic [ref=e1201]:
+        - img [ref=e1203]
+        - generic [ref=e1207]:
+          - heading "Extraction Summary Card" [level=2] [ref=e1208]
+          - generic [ref=e1209]:
+            - generic [ref=e1210]: <x-gegis-library-extraction-summary>
+            - generic [ref=e1211]: primitives
+            - generic [ref=e1212]: 5 props
+            - generic [ref=e1213]: 3 events
+      - paragraph [ref=e1214]: "A custom version/extraction summary: a version dropdown plus a green summary card (name, CURRENT badge, created/triggered-by, document & field stats, low-confidence warning). Driven by a JSON array; the dropdown switches the displayed version."
+      - paragraph [ref=e1215]:
+        - strong [ref=e1216]: "Standard components used:"
+        - text: none — fully custom
+      - figure "Sample preview (local)." [ref=e1217]:
+        - img "Extraction Summary Card preview"
+        - generic [ref=e1218]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e1219]
+      - table [ref=e1220]:
+        - rowgroup [ref=e1221]:
+          - row "Property Label Type Default Description" [ref=e1222]:
+            - columnheader "Property" [ref=e1223]
+            - columnheader "Label" [ref=e1224]
+            - columnheader "Type" [ref=e1225]
+            - columnheader "Default" [ref=e1226]
+            - columnheader "Description" [ref=e1227]
+        - rowgroup [ref=e1228]:
+          - 'row "versions Versions (JSON array) json see sample ▾ Array of version objects. Each item: { id, label, name, current, created, triggeredBy, documents, totalFields, newFields, modified, lowConfidence }. Bind a data resource here." [ref=e1229]':
+            - cell "versions" [ref=e1230]:
+              - code [ref=e1231]: versions
+            - cell "Versions (JSON array)" [ref=e1232]
+            - cell "json" [ref=e1233]
+            - cell "see sample ▾" [ref=e1234]
+            - 'cell "Array of version objects. Each item: { id, label, name, current, created, triggeredBy, documents, totalFields, newFields, modified, lowConfidence }. Bind a data resource here." [ref=e1235]'
+          - row "selectedId Selected version id string Which version's id is shown. Empty shows the first item. Updated automatically when the dropdown changes." [ref=e1236]:
+            - cell "selectedId" [ref=e1237]:
+              - code [ref=e1238]: selectedId
+            - cell "Selected version id" [ref=e1239]
+            - cell "string" [ref=e1240]
+            - cell [ref=e1241]:
+              - code [ref=e1242]
+            - cell "Which version's id is shown. Empty shows the first item. Updated automatically when the dropdown changes." [ref=e1243]
+          - 'row "versionLabel Picker label string Version: Small label shown above the dropdown." [ref=e1244]':
+            - cell "versionLabel" [ref=e1245]:
+              - code [ref=e1246]: versionLabel
+            - cell "Picker label" [ref=e1247]
+            - cell "string" [ref=e1248]
+            - cell "Version:" [ref=e1249]:
+              - code [ref=e1250]: "Version:"
+            - cell "Small label shown above the dropdown." [ref=e1251]
+          - row "button1Label Button 1 label string View Extraction Timeline Left action button (has a clock icon)." [ref=e1252]:
+            - cell "button1Label" [ref=e1253]:
+              - code [ref=e1254]: button1Label
+            - cell "Button 1 label" [ref=e1255]
+            - cell "string" [ref=e1256]
+            - cell "View Extraction Timeline" [ref=e1257]:
+              - code [ref=e1258]: View Extraction Timeline
+            - cell "Left action button (has a clock icon)." [ref=e1259]
+          - row "button2Label Button 2 label string Proceed to Data Audit Right action button." [ref=e1260]:
+            - cell "button2Label" [ref=e1261]:
+              - code [ref=e1262]: button2Label
+            - cell "Button 2 label" [ref=e1263]
+            - cell "string" [ref=e1264]
+            - cell "Proceed to Data Audit" [ref=e1265]:
+              - code [ref=e1266]: Proceed to Data Audit
+            - cell "Right action button." [ref=e1267]
+      - heading "Events" [level=3] [ref=e1268]
+      - table [ref=e1269]:
+        - rowgroup [ref=e1270]:
+          - row "Event Label Payload When / use" [ref=e1271]:
+            - columnheader "Event" [ref=e1272]
+            - columnheader "Label" [ref=e1273]
+            - columnheader "Payload" [ref=e1274]
+            - columnheader "When / use" [ref=e1275]
+        - rowgroup [ref=e1276]:
+          - 'row "VERSION_CHANGED Version changed id:string Fired when the dropdown selection changes. Payload: { id }." [ref=e1277]':
+            - cell "VERSION_CHANGED" [ref=e1278]:
+              - code [ref=e1279]: VERSION_CHANGED
+            - cell "Version changed" [ref=e1280]
+            - cell "id:string" [ref=e1281]:
+              - code [ref=e1282]: id
+              - text: :string
+            - 'cell "Fired when the dropdown selection changes. Payload: { id }." [ref=e1283]'
+          - 'row "VIEW_TIMELINE_CLICKED View timeline clicked id:string Fired when the View timeline button is clicked. Payload: { id }." [ref=e1284]':
+            - cell "VIEW_TIMELINE_CLICKED" [ref=e1285]:
+              - code [ref=e1286]: VIEW_TIMELINE_CLICKED
+            - cell "View timeline clicked" [ref=e1287]
+            - cell "id:string" [ref=e1288]:
+              - code [ref=e1289]: id
+              - text: :string
+            - 'cell "Fired when the View timeline button is clicked. Payload: { id }." [ref=e1290]'
+          - 'row "PROCEED_TO_AUDIT_CLICKED Proceed to audit clicked id:string Fired when the Proceed to audit button is clicked. Payload: { id }." [ref=e1291]':
+            - cell "PROCEED_TO_AUDIT_CLICKED" [ref=e1292]:
+              - code [ref=e1293]: PROCEED_TO_AUDIT_CLICKED
+            - cell "Proceed to audit clicked" [ref=e1294]
+            - cell "id:string" [ref=e1295]:
+              - code [ref=e1296]: id
+              - text: :string
+            - 'cell "Fired when the Proceed to audit button is clicked. Payload: { id }." [ref=e1297]'
+      - heading "Sample input JSON" [level=3] [ref=e1298]
+      - heading "versions" [level=4] [ref=e1299]:
+        - code [ref=e1300]: versions
+      - generic [ref=e1301]:
+        - button "Copy" [ref=e1302] [cursor=pointer]
+        - code [ref=e1304]: "[]"
+    - generic [ref=e1305]:
+      - generic [ref=e1306]:
+        - img [ref=e1308]
+        - generic [ref=e1314]:
+          - heading "Toggle Card" [level=2] [ref=e1315]
+          - generic [ref=e1316]:
+            - generic [ref=e1317]: <x-gegis-library-toggle-card>
+            - generic [ref=e1318]: primitives
+            - generic [ref=e1319]: 5 props
+            - generic [ref=e1320]: 1 events
+      - paragraph [ref=e1321]: A single titled card with a list of on/off toggle rows (with optional required asterisk). Driven by a JSON array; drop several to build a grid.
+      - paragraph [ref=e1322]:
+        - strong [ref=e1323]: "Standard components used:"
+        - text: none — fully custom
+      - figure "Sample preview (local)." [ref=e1324]:
+        - img "Toggle Card preview"
+        - generic [ref=e1325]: Sample preview (local).
+      - heading "Properties" [level=3] [ref=e1326]
+      - table [ref=e1327]:
+        - rowgroup [ref=e1328]:
+          - row "Property Label Type Default Description" [ref=e1329]:
+            - columnheader "Property" [ref=e1330]
+            - columnheader "Label" [ref=e1331]
+            - columnheader "Type" [ref=e1332]
+            - columnheader "Default" [ref=e1333]
+            - columnheader "Description" [ref=e1334]
+        - rowgroup [ref=e1335]:
+          - row "title Card title string Core Property Heading shown at the top of the card." [ref=e1336]:
+            - cell "title" [ref=e1337]:
+              - code [ref=e1338]: title
+            - cell "Card title" [ref=e1339]
+            - cell "string" [ref=e1340]
+            - cell "Core Property" [ref=e1341]:
+              - code [ref=e1342]: Core Property
+            - cell "Heading shown at the top of the card." [ref=e1343]
+          - 'row "items Items (JSON array) json see sample ▾ Toggle rows. Each item: { label, on (boolean), required (boolean) }. Bind a data resource or paste JSON." [ref=e1344]':
+            - cell "items" [ref=e1345]:
+              - code [ref=e1346]: items
+            - cell "Items (JSON array)" [ref=e1347]
+            - cell "json" [ref=e1348]
+            - cell "see sample ▾" [ref=e1349]
+            - 'cell "Toggle rows. Each item: { label, on (boolean), required (boolean) }. Bind a data resource or paste JSON." [ref=e1350]'
+          - row "onLabel On text string On Text shown next to a toggle when it is on." [ref=e1351]:
+            - cell "onLabel" [ref=e1352]:
+              - code [ref=e1353]: onLabel
+            - cell "On text" [ref=e1354]
+            - cell "string" [ref=e1355]
+            - cell "On" [ref=e1356]:
+              - code [ref=e1357]: "On"
+            - cell "Text shown next to a toggle when it is on." [ref=e1358]
+          - row "offLabel Off text string Off Text shown next to a toggle when it is off." [ref=e1359]:
+            - cell "offLabel" [ref=e1360]:
+              - code [ref=e1361]: offLabel
+            - cell "Off text" [ref=e1362]
+            - cell "string" [ref=e1363]
+            - cell "Off" [ref=e1364]:
+              - code [ref=e1365]: "Off"
+            - cell "Text shown next to a toggle when it is off." [ref=e1366]
+          - row "showStateText Show On/Off text boolean true When on, shows the On/Off label beside each toggle." [ref=e1367]:
+            - cell "showStateText" [ref=e1368]:
+              - code [ref=e1369]: showStateText
+            - cell "Show On/Off text" [ref=e1370]
+            - cell "boolean" [ref=e1371]
+            - cell "true" [ref=e1372]:
+              - code [ref=e1373]: "true"
+            - cell "When on, shows the On/Off label beside each toggle." [ref=e1374]
+      - heading "Events" [level=3] [ref=e1375]
+      - table [ref=e1376]:
+        - rowgroup [ref=e1377]:
+          - row "Event Label Payload When / use" [ref=e1378]:
+            - columnheader "Event" [ref=e1379]
+            - columnheader "Label" [ref=e1380]
+            - columnheader "Payload" [ref=e1381]
+            - columnheader "When / use" [ref=e1382]
+        - rowgroup [ref=e1383]:
+          - 'row "TOGGLE_CHANGED Toggle changed index:number label:string on:boolean Fired when a row''s toggle is switched. Payload: { index, label, on }." [ref=e1384]':
+            - cell "TOGGLE_CHANGED" [ref=e1385]:
+              - code [ref=e1386]: TOGGLE_CHANGED
+            - cell "Toggle changed" [ref=e1387]
+            - cell "index:number label:string on:boolean" [ref=e1388]:
+              - code [ref=e1389]: index
+              - text: :number
+              - code [ref=e1390]: label
+              - text: :string
+              - code [ref=e1391]: "on"
+              - text: :boolean
+            - 'cell "Fired when a row''s toggle is switched. Payload: { index, label, on }." [ref=e1392]'
+      - heading "Sample input JSON" [level=3] [ref=e1393]
+      - heading "items" [level=4] [ref=e1394]:
+        - code [ref=e1395]: items
+      - generic [ref=e1396]:
+        - button "Copy" [ref=e1397] [cursor=pointer]
+        - code [ref=e1399]: "[]"
+    - generic [ref=e1400]:
+      - text: Generated from each component's
+      - code [ref=e1401]: now-ui.json
+      - text: · 11 components · built 2026-06-01 · scope
+      - code [ref=e1402]: x_gegis_library
+      - text: .

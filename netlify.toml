@@ -16,6 +16,18 @@
   to = "/.netlify/functions/auth-token"
   status = 200
 
+# Static docs catalog mounted at /docs — serve real files, never the SPA fallback.
+# Redirect bare /docs -> /docs/ so relative asset paths resolve under /docs/.
+[[redirects]]
+  from = "/docs"
+  to = "/docs/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/*"
+  to = "/docs/:splat"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

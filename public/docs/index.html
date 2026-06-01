@@ -1,0 +1,978 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GEGIS Library — ServiceNow Component Catalog</title>
+<meta name="description" content="Enterprise catalog of x_gegis_library ServiceNow Next Experience components: properties, events, and sample inputs." />
+<style>
+  :root{--bg:#f4f6f9;--surface:#fff;--ink:#1b2333;--muted:#6b7488;--line:#e4e8ee;--accent:#2f6fed;--accent-soft:#eef3ff;--code-bg:#0f172a;--code-ink:#e2e8f0;--ok:#16794e}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Lato',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+  a{color:var(--accent);text-decoration:none}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:#eef0f4;border-radius:4px;padding:1px 5px;color:#243049}
+  .wrap{display:grid;grid-template-columns:284px 1fr;min-height:100vh}
+  .side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;background:var(--surface);border-right:1px solid var(--line);padding:22px 16px}
+  .brand{display:flex;align-items:center;gap:10px;margin:0 0 2px}
+  .brand .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#2f6fed,#1e40af);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+  .brand b{font-size:16px}
+  .side .scope{font-size:12px;color:var(--muted);margin:2px 0 16px 44px}
+  .side nav{display:flex;flex-direction:column;gap:1px}
+  .side nav a{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;color:#2a3242;font-size:13.5px}
+  .side nav a:hover{background:var(--accent-soft);color:var(--accent)}
+  .side nav a .nav-ic{width:18px;height:18px;flex:0 0 18px;display:inline-flex}
+  .side nav a .nav-ic svg{width:18px;height:18px}
+  .side .note{margin-top:18px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+  main{padding:40px 52px;max-width:1120px}
+  header.hero h1{font-size:30px;margin:0 0 8px;letter-spacing:-.01em}
+  header.hero p.lead{color:var(--muted);margin:0 0 16px;max-width:780px;font-size:15px}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 16px}
+  .stat b{display:block;font-size:20px}
+  .stat span{font-size:12px;color:var(--muted)}
+  .rules{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-top:6px}
+  .rules h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .rules ul{margin:0;padding-left:18px;font-size:13.5px}.rules li{margin:4px 0}
+  .comp{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin:26px 0;scroll-margin-top:18px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+  .comp-head{display:flex;align-items:center;gap:14px}
+  .comp-icon{width:44px;height:44px;flex:0 0 44px;border-radius:11px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center}
+  .comp-icon svg{width:26px;height:26px}
+  .comp-head-main{flex:1;min-width:0}
+  .comp-head h2{margin:0 0 5px;font-size:21px}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{display:inline-block;font-size:12px;padding:3px 9px;border-radius:999px;background:#eef0f4;color:#3a4554;white-space:nowrap}
+  .chip-tag{background:#11203a;color:#cfe0ff;font-family:ui-monospace,monospace}
+  .chip-now{background:var(--accent-soft);color:var(--accent)}
+  .desc{color:#3a4554;margin:12px 0 6px}
+  .inner{font-size:13.5px;color:#3a4554;margin:6px 0 4px}
+  .comp h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:22px 0 8px}
+  .comp h4{margin:14px 0 5px;font-size:13.5px}
+  .muted{color:var(--muted)}
+  .badge{font-size:10px;background:#fde9c8;color:#92560d;border-radius:4px;padding:1px 6px;text-transform:uppercase;letter-spacing:.03em}
+  .warn{background:#fff6e6;border:1px solid #f3d28a;color:#7a4d06;border-radius:8px;padding:8px 12px;font-size:13px;margin:2px 0 8px}.warn code{background:#f6e6c3}
+  .shot{margin:14px 0 4px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fafbfc}
+  .shot img{display:block;width:100%;height:auto}
+  .shot figcaption{font-size:11.5px;color:var(--muted);padding:6px 12px;border-top:1px solid var(--line);background:#fff}
+  table.tbl{width:100%;border-collapse:collapse;font-size:13.5px;margin:4px 0 6px}
+  table.tbl th{text-align:left;background:#f7f8fa;border-bottom:2px solid var(--line);padding:8px 10px;font-size:11.5px;color:#54607a;text-transform:uppercase;letter-spacing:.03em}
+  table.tbl td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+  table.tbl tr:hover td{background:#fafbfc}
+  .code{position:relative;margin:6px 0 10px}
+  .code pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px;overflow:auto;font-size:12.5px;line-height:1.55;margin:0}
+  .code code{background:none;color:inherit;padding:0}
+  .copy{position:absolute;top:10px;right:10px;background:#1e293b;color:#cbd5e1;border:1px solid #334155;border-radius:6px;font-size:11px;padding:4px 9px;cursor:pointer}
+  .copy:hover{background:#334155;color:#fff}.copy.done{background:var(--ok);border-color:var(--ok);color:#fff}
+  footer{color:var(--muted);font-size:13px;padding:24px 0 8px;border-top:1px solid var(--line);margin-top:14px}
+  @media(max-width:880px){.wrap{grid-template-columns:1fr}.side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side">
+    <p class="brand"><span class="logo">GG</span><b>GEGIS Library</b></p>
+    <p class="scope">scope: x_gegis_library</p>
+    <nav>
+      <a href="#top">Overview</a>
+      <a href="#product-selector"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- selected card (top) with filled radio -->
+  <rect x="5" y="8" width="38" height="14" rx="4" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <circle cx="13" cy="15" r="3.2" fill="#474747"/>
+  <rect x="20" y="13.5" width="17" height="3" rx="1.5" fill="#474747"/>
+  <!-- second card (bottom) with empty radio -->
+  <rect x="5" y="26" width="38" height="14" rx="4" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <circle cx="13" cy="33" r="3.2" fill="none" stroke="#474747" stroke-width="2"/>
+  <rect x="20" y="31.5" width="17" height="3" rx="1.5" fill="#474747"/>
+</svg>
+</span>Product Selector</a>
+<a href="#selected-product"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield -->
+  <path d="M24 6 L38 11 V23 C38 32 32 38 24 42 C16 38 10 32 10 23 V11 Z" fill="none" stroke="#474747" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Check -->
+  <path d="M18 23 L22.5 28 L31 18" fill="none" stroke="#474747" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</span>Selected Product Summary</a>
+<a href="#quote-comparison"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Table frame -->
+  <rect x="5" y="7" width="38" height="34" rx="4" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Column dividers -->
+  <line x1="21" y1="7" x2="21" y2="41" stroke="#474747" stroke-width="2"/>
+  <line x1="32" y1="7" x2="32" y2="41" stroke="#474747" stroke-width="2"/>
+  <!-- Header band -->
+  <line x1="5" y1="16" x2="43" y2="16" stroke="#474747" stroke-width="2"/>
+  <!-- Row lines -->
+  <line x1="5" y1="24" x2="43" y2="24" stroke="#474747" stroke-width="1.6"/>
+  <line x1="5" y1="32" x2="43" y2="32" stroke="#474747" stroke-width="1.6"/>
+</svg>
+</span>Quote Versions Comparison</a>
+<a href="#quote-action-bar"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Toolbar frame -->
+  <rect x="5" y="14" width="38" height="20" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Checkbox (select) -->
+  <rect x="10" y="20" width="8" height="8" rx="2" fill="none" stroke="#474747" stroke-width="2"/>
+  <path d="M11.5 24 L13.5 26 L17 21.5" fill="none" stroke="#474747" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Action button (filled) -->
+  <rect x="28" y="19.5" width="10" height="9" rx="2.5" fill="#474747"/>
+  <path d="M33 21.5 V26.5 M30.5 24 H35.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+</span>Quote Options Action Bar</a>
+<a href="#peril-deductibles"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card frame -->
+  <rect x="5" y="8" width="38" height="32" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Header divider -->
+  <line x1="5" y1="18" x2="43" y2="18" stroke="#474747" stroke-width="2"/>
+  <!-- Row line -->
+  <line x1="11" y1="26" x2="24" y2="26" stroke="#474747" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Toggle (on) -->
+  <rect x="29" y="23" width="11" height="6" rx="3" fill="#474747"/>
+  <circle cx="37" cy="26" r="2" fill="#fff"/>
+  <!-- Row line 2 -->
+  <line x1="11" y1="33" x2="24" y2="33" stroke="#474747" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Toggle (off) -->
+  <rect x="29" y="30" width="11" height="6" rx="3" fill="none" stroke="#474747" stroke-width="1.5"/>
+  <circle cx="32" cy="33" r="1.6" fill="#474747"/>
+</svg>
+</span>Peril-Specific Deductibles</a>
+<a href="#metric-card"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card frame -->
+  <rect x="5" y="9" width="38" height="30" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- KPI bars (rising) -->
+  <rect x="12" y="25" width="5" height="9" rx="1.5" fill="#474747"/>
+  <rect x="21.5" y="20" width="5" height="14" rx="1.5" fill="#474747"/>
+  <rect x="31" y="15" width="5" height="19" rx="1.5" fill="#474747"/>
+</svg>
+</span>Dashboard Metric Card</a>
+<a href="#collapse"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Header bar -->
+  <rect x="6" y="9" width="36" height="11" rx="3" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Chevron in header -->
+  <path d="M31 13l3 3 3-3" fill="none" stroke="#474747" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Expanded content -->
+  <rect x="6" y="24" width="36" height="15" rx="3" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <line x1="11" y1="29.5" x2="33" y2="29.5" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <line x1="11" y1="34" x2="27" y2="34" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
+</span>Collapse / Expand Panel</a>
+<a href="#dynamic-form"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card -->
+  <rect x="5" y="7" width="38" height="34" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Section title -->
+  <line x1="11" y1="14" x2="26" y2="14" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Field boxes (2 cols) -->
+  <rect x="11" y="19" width="12" height="6" rx="2" fill="none" stroke="#474747" stroke-width="1.6"/>
+  <rect x="25" y="19" width="12" height="6" rx="2" fill="none" stroke="#474747" stroke-width="1.6"/>
+  <rect x="11" y="28" width="12" height="6" rx="2" fill="none" stroke="#474747" stroke-width="1.6"/>
+  <rect x="25" y="28" width="12" height="6" rx="2" fill="#474747"/>
+</svg>
+</span>Dynamic Form</a>
+<a href="#endorsement-card"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card -->
+  <rect x="5" y="8" width="38" height="32" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Title line -->
+  <line x1="11" y1="15" x2="30" y2="15" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Pills -->
+  <rect x="11" y="20" width="8" height="5" rx="2.5" fill="#474747"/>
+  <rect x="22" y="20" width="11" height="5" rx="2.5" fill="none" stroke="#474747" stroke-width="1.6"/>
+  <!-- Action button -->
+  <rect x="11" y="31" width="26" height="5" rx="2.5" fill="none" stroke="#474747" stroke-width="1.8"/>
+</svg>
+</span>Endorsement Card</a>
+<a href="#extraction-summary"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card -->
+  <rect x="5" y="11" width="38" height="26" rx="4" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Check circle -->
+  <circle cx="13" cy="19" r="3.5" fill="none" stroke="#474747" stroke-width="2"/>
+  <!-- Badge -->
+  <rect x="22" y="16" width="14" height="6" rx="3" fill="#474747"/>
+  <!-- Stat lines -->
+  <line x1="11" y1="28" x2="25" y2="28" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <line x1="11" y1="32.5" x2="37" y2="32.5" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
+</span>Extraction Summary Card</a>
+<a href="#toggle-card"><span class="nav-ic"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card -->
+  <rect x="5" y="9" width="38" height="30" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Row 1: label + switch (on) -->
+  <line x1="11" y1="19" x2="20" y2="19" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <rect x="29" y="15.5" width="11" height="7" rx="3.5" fill="#474747"/>
+  <circle cx="36.5" cy="19" r="2.3" fill="#ffffff"/>
+  <!-- Row 2: label + switch (off) -->
+  <line x1="11" y1="29" x2="20" y2="29" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <rect x="29" y="25.5" width="11" height="7" rx="3.5" fill="none" stroke="#474747" stroke-width="1.6"/>
+  <circle cx="32.5" cy="29" r="2.3" fill="#474747"/>
+</svg>
+</span>Toggle Card</a>
+    </nav>
+    <p class="note">ServiceNow Next Experience custom components — each composes standard Horizon <code>now-*</code> components and is configured + bound entirely through UI Builder.</p>
+  </aside>
+
+  <main id="top">
+    <header class="hero">
+      <h1>ServiceNow Component Catalog</h1>
+      <p class="lead">Reference for the <strong>x_gegis_library</strong> Next Experience components — configuration properties, dispatched events (with payloads), and copy-paste sample inputs.</p>
+      <div class="stats">
+        <div class="stat"><b>11</b><span>Components</span></div>
+        <div class="stat"><b>19</b><span>Bindable events</span></div>
+        <div class="stat"><b>x_gegis_library</b><span>Scope</span></div>
+      </div>
+      <div class="rules">
+        <h3>How these components work</h3>
+        <ul>
+          <li><strong>Composition:</strong> built from standard Horizon <code>now-*</code> components, customized via properties / slots / design tokens — never hand-rolled.</li>
+          <li><strong>Configuration:</strong> every property below is set in UI Builder and bindable to data resources / client state.</li>
+          <li><strong>Events:</strong> declared as <code>actions</code> so they appear in the UI Builder <em>Events</em> tab. Only events an external page needs to bind are exposed — purely internal UI state isn't.</li>
+        </ul>
+      </div>
+    </header>
+
+    
+  <section class="comp" id="product-selector">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- selected card (top) with filled radio -->
+  <rect x="5" y="8" width="38" height="14" rx="4" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <circle cx="13" cy="15" r="3.2" fill="#474747"/>
+  <rect x="20" y="13.5" width="17" height="3" rx="1.5" fill="#474747"/>
+  <!-- second card (bottom) with empty radio -->
+  <rect x="5" y="26" width="38" height="14" rx="4" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <circle cx="13" cy="33" r="3.2" fill="none" stroke="#474747" stroke-width="2"/>
+  <rect x="20" y="31.5" width="17" height="3" rx="1.5" fill="#474747"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Product Selector</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-product-selector&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">3 props</span>
+          <span class="chip">1 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">A single-select (radio) group of product cards: each option has a title, optional subtitle + checkmark bullets, and a pill. Composes now-card + now-highlighted-value + now-icon.</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="chip chip-now">now-card</span> <span class="chip chip-now">now-icon</span></p>
+    <figure class="shot"><img src="screens/product-selector.png" alt="Product Selector preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>options</code></td><td>Options</td><td>json</td><td><span class="muted">—</span></td><td>Array of product options. Each: { id, title, subtitle, bullets:[string], pill, pillTone: info|neutral|positive|warning|error, pillIcon }.</td></tr>
+<tr><td><code>value</code></td><td>Selected option id</td><td>string</td><td><code></code></td><td>The id of the currently selected option. Leave empty to select the first option by default.</td></tr>
+<tr><td><code>bulletsWhenSelectedOnly</code></td><td>Show details only when selected</td><td>boolean</td><td><code>true</code></td><td>When on, the subtitle and bullet points show only for the selected card.</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <table class="tbl"><thead><tr><th>Event</th><th>Label</th><th>Payload</th><th>When / use</th></tr></thead><tbody><tr><td><code>PRODUCT_SELECTED</code></td><td>Product selected</td><td><code>value</code><span class="muted">:string</span></td><td>Fired when the user selects an option. Payload: { value }.</td></tr></tbody></table>
+    <h3>Sample input JSON</h3><h4><code>options</code> <span class="badge">sample</span></h4><div class="code"><button class="copy" data-target="product-selector-options">Copy</button><pre id="product-selector-options"><code>[
+  {
+    &quot;id&quot;: &quot;commercial-standard&quot;,
+    &quot;title&quot;: &quot;Commercial Property – Standard Plan&quot;,
+    &quot;pill&quot;: &quot;AI Recommended&quot;,
+    &quot;pillTone&quot;: &quot;info&quot;,
+    &quot;pillIcon&quot;: &quot;sparkles-outline&quot;,
+    &quot;subtitle&quot;: &quot;Why we recommend:&quot;,
+    &quot;bullets&quot;: [
+      &quot;Matches industry: Manufacturing&quot;,
+      &quot;Covers key risks: Fire, Machinery&quot;,
+      &quot;Within underwriting guidelines&quot;,
+      &quot;Balanced premium vs coverage&quot;
+    ]
+  },
+  {
+    &quot;id&quot;: &quot;commercial-premium&quot;,
+    &quot;title&quot;: &quot;Commercial Property – Premium Plan&quot;,
+    &quot;pill&quot;: &quot;Best Coverage&quot;,
+    &quot;pillTone&quot;: &quot;positive&quot;,
+    &quot;pillIcon&quot;: &quot;shield-outline&quot;,
+    &quot;subtitle&quot;: &quot;What's included:&quot;,
+    &quot;bullets&quot;: [
+      &quot;Full replacement-cost cover&quot;,
+      &quot;Equipment breakdown included&quot;,
+      &quot;24/7 priority claims handling&quot;
+    ]
+  },
+  {
+    &quot;id&quot;: &quot;flood&quot;,
+    &quot;title&quot;: &quot;Flood Insurance&quot;,
+    &quot;pill&quot;: &quot;Higher Protection&quot;,
+    &quot;pillTone&quot;: &quot;neutral&quot;,
+    &quot;bullets&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;business&quot;,
+    &quot;title&quot;: &quot;Business Interruption&quot;,
+    &quot;pill&quot;: &quot;Lower Premium&quot;,
+    &quot;pillTone&quot;: &quot;neutral&quot;,
+    &quot;bullets&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;cyber&quot;,
+    &quot;title&quot;: &quot;Cyber Liability&quot;,
+    &quot;pill&quot;: &quot;Add-on&quot;,
+    &quot;pillTone&quot;: &quot;warning&quot;,
+    &quot;bullets&quot;: []
+  }
+]</code></pre></div>
+  </section>
+
+  <section class="comp" id="selected-product">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield -->
+  <path d="M24 6 L38 11 V23 C38 32 32 38 24 42 C16 38 10 32 10 23 V11 Z" fill="none" stroke="#474747" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Check -->
+  <path d="M18 23 L22.5 28 L31 18" fill="none" stroke="#474747" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Selected Product Summary</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-selected-product&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">12 props</span>
+          <span class="chip">3 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">A selected-product summary bar (icon, product name, star, subtitle) with a Change Product action that opens a confirmation modal. Composes now-icon + now-button + now-modal.</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="chip chip-now">now-icon</span> <span class="chip chip-now">now-button</span> <span class="chip chip-now">now-modal</span></p>
+    <figure class="shot"><img src="screens/selected-product.png" alt="Selected Product Summary preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>productPrefix</code></td><td>Product label prefix</td><td>string</td><td><code>Product:</code></td><td>Text shown before the product name (e.g. &quot;Product:&quot;). Leave empty to show only the name.</td></tr>
+<tr><td><code>productName</code></td><td>Product name</td><td>string</td><td><code>Commercial Property – Standard Plan</code></td><td>The selected product's name.</td></tr>
+<tr><td><code>subtitle</code></td><td>Subtitle</td><td>string</td><td><code>Base limits and clauses applied from selected product</code></td><td>Secondary line under the product name.</td></tr>
+<tr><td><code>icon</code></td><td>Leading icon</td><td>string</td><td><code>shield-outline</code></td><td>now-icon name shown at the start of the bar. Leave empty to hide.</td></tr>
+<tr><td><code>showStar</code></td><td>Show star</td><td>boolean</td><td><code>true</code></td><td>When on, shows a star after the product name (e.g. a recommended indicator).</td></tr>
+<tr><td><code>starIcon</code></td><td>Star icon</td><td>string</td><td><code>star-fill</code></td><td>now-icon name for the star indicator.</td></tr>
+<tr><td><code>changeButtonLabel</code></td><td>Change button label</td><td>string</td><td><code>Change Product</code></td><td>Label for the action button on the bar.</td></tr>
+<tr><td><code>confirmHeader</code></td><td>Confirm dialog header</td><td>string</td><td><code>Change Product</code></td><td>Title of the confirmation modal.</td></tr>
+<tr><td><code>confirmMessage</code></td><td>Confirm dialog message</td><td>string</td><td><code>Changing the product will archive all existing quote options. This action cannot be undone.</code></td><td>Body text of the confirmation modal.</td></tr>
+<tr><td><code>confirmIcon</code></td><td>Confirm dialog icon</td><td>string</td><td><code>circle-exclamation-outline</code></td><td>now-icon name shown beside the confirmation message (warning glyph). Leave empty to hide.</td></tr>
+<tr><td><code>confirmLabel</code></td><td>Confirm button label</td><td>string</td><td><code>Continue</code></td><td>Primary (confirm) button label in the modal footer.</td></tr>
+<tr><td><code>cancelLabel</code></td><td>Cancel button label</td><td>string</td><td><code>Cancel</code></td><td>Secondary (cancel) button label in the modal footer.</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <table class="tbl"><thead><tr><th>Event</th><th>Label</th><th>Payload</th><th>When / use</th></tr></thead><tbody><tr><td><code>CHANGE_PRODUCT_REQUESTED</code></td><td>Change product requested</td><td><code>productName</code><span class="muted">:string</span></td><td>Fired when the user clicks Change Product (the confirmation modal opens).</td></tr>
+<tr><td><code>CHANGE_PRODUCT_CONFIRMED</code></td><td>Change product confirmed</td><td><code>productName</code><span class="muted">:string</span></td><td>Fired when the user confirms the change in the modal (primary action). Use this to archive existing quote options and return to product selection.</td></tr>
+<tr><td><code>CHANGE_PRODUCT_CANCELLED</code></td><td>Change product cancelled</td><td><span class="muted">no payload</span></td><td>Fired when the user cancels or dismisses the confirmation modal.</td></tr></tbody></table>
+    
+  </section>
+
+  <section class="comp" id="quote-comparison">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Table frame -->
+  <rect x="5" y="7" width="38" height="34" rx="4" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Column dividers -->
+  <line x1="21" y1="7" x2="21" y2="41" stroke="#474747" stroke-width="2"/>
+  <line x1="32" y1="7" x2="32" y2="41" stroke="#474747" stroke-width="2"/>
+  <!-- Header band -->
+  <line x1="5" y1="16" x2="43" y2="16" stroke="#474747" stroke-width="2"/>
+  <!-- Row lines -->
+  <line x1="5" y1="24" x2="43" y2="24" stroke="#474747" stroke-width="1.6"/>
+  <line x1="5" y1="32" x2="43" y2="32" stroke="#474747" stroke-width="1.6"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Quote Versions Comparison</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-quote-comparison&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">3 props</span>
+          <span class="chip">2 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">A custom comparison grid: each version (v1/v2/v3 — records from the same table) is a column; fields grouped by section are rows. Handles tick/cross, currency, aggregation, pills, percentage, and trend. Driven by a JSON array.</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="muted">none — fully custom</span></p>
+    <figure class="shot"><img src="screens/quote-comparison.png" alt="Quote Versions Comparison preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>versions</code></td><td>Versions (JSON array)</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>Array of version objects, one per column. Each: { header:{title,option,status,selectable}, sections:[{sectionName,type,fields:[{label,value,displayType,formatted,...}]}], actions:[] }. The first version defines the rows; bind a data resource with your v1/v2/v3 records.</td></tr>
+<tr><td><code>title</code></td><td>Title</td><td>string</td><td><code>Quote Versions Comparison</code></td><td>Fallback title shown if the first version has no header.title.</td></tr>
+<tr><td><code>labelWidth</code></td><td>Label column width</td><td>string</td><td><code>200px</code></td><td>CSS width of the left (field-label) column, e.g. 200px or 16rem.</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <table class="tbl"><thead><tr><th>Event</th><th>Label</th><th>Payload</th><th>When / use</th></tr></thead><tbody><tr><td><code>VERSION_SELECTED</code></td><td>Version selected</td><td><code>index</code><span class="muted">:number</span> &nbsp; <code>checked</code><span class="muted">:boolean</span></td><td>Fired when a column's Select checkbox changes. Payload: { index, checked }.</td></tr>
+<tr><td><code>ACTION_CLICKED</code></td><td>Action clicked</td><td><code>index</code><span class="muted">:number</span> &nbsp; <code>action</code><span class="muted">:string</span></td><td>Fired when a footer action button is clicked. Payload: { index, action }.</td></tr></tbody></table>
+    <h3>Sample input JSON</h3><h4><code>versions</code> <span class="badge">sample</span></h4><div class="code"><button class="copy" data-target="quote-comparison-versions">Copy</button><pre id="quote-comparison-versions"><code>[
+  {
+    &quot;header&quot;: {
+      &quot;title&quot;: &quot;Quote Versions Comparison&quot;,
+      &quot;option&quot;: &quot;Version 1&quot;,
+      &quot;status&quot;: {
+        &quot;label&quot;: &quot;Current&quot;,
+        &quot;color&quot;: &quot;gray&quot;
+      },
+      &quot;selectable&quot;: true
+    },
+    &quot;sections&quot;: [
+      {
+        &quot;sectionName&quot;: &quot;Overview&quot;,
+        &quot;type&quot;: &quot;header_summary&quot;,
+        &quot;fields&quot;: [
+          {
+            &quot;label&quot;: &quot;Effective date&quot;,
+            &quot;value&quot;: &quot;2026-07-01&quot;,
+            &quot;displayType&quot;: &quot;text&quot;,
+            &quot;formatted&quot;: &quot;Jul 1, 2026&quot;
+          },
+          {
+            &quot;label&quot;: &quot;AI recommended&quot;,
+            &quot;value&quot;: false,
+            &quot;displayType&quot;: &quot;tick_cross&quot;
+          }
+        ]
+      },
+      {
+        &quot;sectionName&quot;: &quot;Coverage&quot;,
+        &quot;type&quot;: &quot;coverage&quot;,
+        &quot;fields&quot;: [
+          {
+            &quot;label&quot;: &quot;Property Damage&quot;,
+            &quot;value&quot;: true,
+            &quot;displayType&quot;: &quot;tick_cross&quot;
+          },
+          {
+            &quot;label&quot;: &quot;Business Interruption&quot;,
+            &quot;value&quot;: true,
+            &quot;displayType&quot;: &quot;tick_cross&quot;
+          },
+          {
+            &quot;label&quot;: &quot;Flood&quot;,
+            &quot;value&quot;: false,
+            &quot;displayType&quot;: &quot;tick_cross&quot;
+          }
+        ]
+      },
+      {
+        &quot;sectionName&quot;: &quot;Premium&quot;,
+        &quot;type&quot;: &quot;premium&quot;,
+        &quot;fields&quot;: [
+          {
+            &quot;label&quot;: &quot;Total Annual Premium&quot;,
+            &quot;value&quot;: 45100,
+            &quot;displayType&quot;: &quot;currency_bold&quot;,
+            &quot;isAggregation&quot;: true,
+            &quot;formatted&quot;: &quot;$45,100&quot;
+          }
+        ]
+      }
+    ],
+    &quot;actions&quot;: [
+      {
+        &quot;label&quot;: &quot;Select&quot;,
+        &quot;style&quot;: &quot;primary&quot;
+      }
+    ]
+  },
+  {
+    &quot;header&quot;: {
+      &quot;option&quot;: &quot;Version 2&quot;,
+      &quot;status&quot;: {
+        &quot;label&quot;: &quot;Recommended&quot;,
+        &quot;color&quot;: &quot;green&quot;
+      },
+      &quot;selectable&quot;: true
+    },
+    &quot;sections&quot;: [
+      {
+        &quot;sectionName&quot;: &quot;Overview&quot;,
+        &quot;type&quot;: &quot;header_summary&quot;,
+        &quot;fields&quot;: [
+          {
+            &quot;label&quot;: &quot;Effective date&quot;,
+            &quot;value&quot;: &quot;2026-07-01&quot;,
+            &quot;displayType&quot;: &quot;text&quot;,
+            &quot;formatted&quot;: &quot;Jul 1, 2026&quot;
+          },
+          {
+            &quot;label&quot;: &quot;AI recommended&quot;,
+            &quot;value&quot;: true,
+            &quot;displayType&quot;: &quot;tick_cross&quot;
+          }
+        ]
+      },
+      {
+        &quot;sectionName&quot;: &quot;Coverage&quot;,
+        &quot;type&quot;: &quot;coverage&quot;,
+        &quot;fields&quot;: [
+          {
+            &quot;label&quot;: &quot;Property Damage&quot;,
+            &quot;value&quot;: true,
+            &quot;displayType&quot;: &quot;tick_cross&quot;
+          },
+          {
+            &quot;label&quot;: &quot;Business Interruption&quot;,
+            &quot;value&quot;: true,
+            &quot;displayType&quot;: &quot;tick_cross&quot;
+          },
+          {
+            &quot;label&quot;: &quot;Flood&quot;,
+            &quot;value&quot;: true,
+            &quot;displayType&quot;: &quot;tick_cross&quot;
+          }
+        ]
+      },
+      {
+        &quot;sectionName&quot;: &quot;Premium&quot;,
+        &quot;type&quot;: &quot;premium&quot;,
+        &quot;fields&quot;: [
+          {
+            &quot;label&quot;: &quot;Total Annual Premium&quot;,
+            &quot;value&quot;: 51000,
+            &quot;displayType&quot;: &quot;currency_bold&quot;,
+            &quot;isAggregation&quot;: true,
+            &quot;formatted&quot;: &quot;$51,000&quot;,
+            &quot;trend&quot;: {
+              &quot;direction&quot;: &quot;increase&quot;,
+              &quot;vsBaseline&quot;: {
+                &quot;formatted&quot;: &quot;+$5,900&quot;,
+                &quot;color&quot;: &quot;red&quot;
+              }
+            }
+          }
+        ]
+      }
+    ],
+    &quot;actions&quot;: [
+      {
+        &quot;label&quot;: &quot;Select&quot;,
+        &quot;style&quot;: &quot;primary&quot;
+      }
+    ]
+  }
+]</code></pre></div>
+  </section>
+
+  <section class="comp" id="quote-action-bar">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Toolbar frame -->
+  <rect x="5" y="14" width="38" height="20" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Checkbox (select) -->
+  <rect x="10" y="20" width="8" height="8" rx="2" fill="none" stroke="#474747" stroke-width="2"/>
+  <path d="M11.5 24 L13.5 26 L17 21.5" fill="none" stroke="#474747" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Action button (filled) -->
+  <rect x="28" y="19.5" width="10" height="9" rx="2.5" fill="#474747"/>
+  <path d="M33 21.5 V26.5 M30.5 24 H35.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Quote Options Action Bar</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-quote-action-bar&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">11 props</span>
+          <span class="chip">4 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">Action bar for quote options: Select All + selected count, Approve Selected and Share to Broker (enabled when 1+ selected), and an always-on Generate New Option. Holds the selection and emits events. Composes now-button + now-icon.</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="chip chip-now">now-button</span> <span class="chip chip-now">now-icon</span></p>
+    <figure class="shot"><img src="screens/quote-action-bar.png" alt="Quote Options Action Bar preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>options</code></td><td>Quote options</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>The quote options. An object with an `items` array of { id, label }. The count shows X of items.length; Select All selects all their ids. (Object-wrapped — a bare top-level array default breaks the production build.)</td></tr>
+<tr><td><code>selectedIds</code></td><td>Selected ids</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>Initial / externally-bound selection. An object with an `ids` array. Select All updates the selection internally from here.</td></tr>
+<tr><td><code>showCount</code></td><td>Show selected count</td><td>boolean</td><td><code>true</code></td><td>When on, shows &quot;X of N selected&quot; next to Select All.</td></tr>
+<tr><td><code>selectAllLabel</code></td><td>Select All label</td><td>string</td><td><code>Select All</code></td><td>Label for the select-all button.</td></tr>
+<tr><td><code>deselectAllLabel</code></td><td>Deselect All label</td><td>string</td><td><code>Deselect All</code></td><td>Label shown on the select-all button when everything is already selected (toggles to clear). Set equal to Select All label to keep it constant.</td></tr>
+<tr><td><code>approveLabel</code></td><td>Approve button label</td><td>string</td><td><code>Approve Selected</code></td><td>Label for the Approve Selected action.</td></tr>
+<tr><td><code>shareLabel</code></td><td>Share button label</td><td>string</td><td><code>Share to Broker</code></td><td>Label for the Share to Broker action.</td></tr>
+<tr><td><code>generateLabel</code></td><td>Generate button label</td><td>string</td><td><code>Generate New Option</code></td><td>Label for the always-enabled Generate New Option action.</td></tr>
+<tr><td><code>approveIcon</code></td><td>Approve icon</td><td>string</td><td><code>circle-check-outline</code></td><td>now-icon name for the Approve Selected button. Leave empty for no icon.</td></tr>
+<tr><td><code>shareIcon</code></td><td>Share icon</td><td>string</td><td><code>share-outline</code></td><td>now-icon name for the Share to Broker button. Leave empty for no icon.</td></tr>
+<tr><td><code>generateIcon</code></td><td>Generate icon</td><td>string</td><td><code>plus-outline</code></td><td>now-icon name for the Generate New Option button. Leave empty for no icon.</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <table class="tbl"><thead><tr><th>Event</th><th>Label</th><th>Payload</th><th>When / use</th></tr></thead><tbody><tr><td><code>SELECTION_CHANGED</code></td><td>Selection changed</td><td><code>selected</code><span class="muted">:json</span> &nbsp; <code>count</code><span class="muted">:number</span></td><td>Fired when Select All toggles the selection. Payload: { selected:[ids], count }.</td></tr>
+<tr><td><code>APPROVE_SELECTED</code></td><td>Approve selected</td><td><code>selected</code><span class="muted">:json</span></td><td>Fired when Approve Selected is clicked (only when 1+ selected). Payload: { selected:[ids] }.</td></tr>
+<tr><td><code>SHARE_TO_BROKER</code></td><td>Share to broker</td><td><code>selected</code><span class="muted">:json</span></td><td>Fired when Share to Broker is clicked (only when 1+ selected). Payload: { selected:[ids] }.</td></tr>
+<tr><td><code>GENERATE_NEW_OPTION</code></td><td>Generate new option</td><td><span class="muted">no payload</span></td><td>Fired when Generate New Option is clicked (always enabled).</td></tr></tbody></table>
+    <h3>Sample input JSON</h3><h4><code>options</code></h4><div class="code"><button class="copy" data-target="quote-action-bar-options">Copy</button><pre id="quote-action-bar-options"><code>{
+  &quot;items&quot;: [
+    {
+      &quot;id&quot;: &quot;opt1&quot;,
+      &quot;label&quot;: &quot;Option 1 v: 1.0&quot;
+    },
+    {
+      &quot;id&quot;: &quot;opt2&quot;,
+      &quot;label&quot;: &quot;Option 2 v: 2.3&quot;
+    },
+    {
+      &quot;id&quot;: &quot;opt3&quot;,
+      &quot;label&quot;: &quot;Option 3 v: 3.0&quot;
+    },
+    {
+      &quot;id&quot;: &quot;opt4&quot;,
+      &quot;label&quot;: &quot;Option 4 v: 1.0&quot;
+    }
+  ]
+}</code></pre></div>
+<h4><code>selectedIds</code></h4><div class="code"><button class="copy" data-target="quote-action-bar-selectedIds">Copy</button><pre id="quote-action-bar-selectedIds"><code>{
+  &quot;ids&quot;: []
+}</code></pre></div>
+  </section>
+
+  <section class="comp" id="peril-deductibles">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card frame -->
+  <rect x="5" y="8" width="38" height="32" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Header divider -->
+  <line x1="5" y1="18" x2="43" y2="18" stroke="#474747" stroke-width="2"/>
+  <!-- Row line -->
+  <line x1="11" y1="26" x2="24" y2="26" stroke="#474747" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Toggle (on) -->
+  <rect x="29" y="23" width="11" height="6" rx="3" fill="#474747"/>
+  <circle cx="37" cy="26" r="2" fill="#fff"/>
+  <!-- Row line 2 -->
+  <line x1="11" y1="33" x2="24" y2="33" stroke="#474747" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Toggle (off) -->
+  <rect x="29" y="30" width="11" height="6" rx="3" fill="none" stroke="#474747" stroke-width="1.5"/>
+  <circle cx="32" cy="33" r="1.6" fill="#474747"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Peril-Specific Deductibles</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-peril-deductibles&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">5 props</span>
+          <span class="chip">1 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">A collapsible card that lists perils, each with an override toggle, a value, and a unit (e.g. % TIV). Composed entirely of standard now-* components.</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="chip chip-now">now-card</span> <span class="chip chip-now">now-card-divider</span> <span class="chip chip-now">now-icon</span> <span class="chip chip-now">now-highlighted-value</span> <span class="chip chip-now">now-toggle</span> <span class="chip chip-now">now-input</span> <span class="chip chip-now">now-dropdown</span></p>
+    <figure class="shot"><img src="screens/peril-deductibles.png" alt="Peril-Specific Deductibles preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>title</code></td><td>Title</td><td>string</td><td><code>Peril-Specific Deductibles</code></td><td>Heading shown in the card header.</td></tr>
+<tr><td><code>expanded</code></td><td>Expanded</td><td>boolean</td><td><code>true</code></td><td>When on, the list of perils is shown. The header chevron toggles this at runtime.</td></tr>
+<tr><td><code>showOverrideCount</code></td><td>Show override count</td><td>boolean</td><td><code>true</code></td><td>When on, the header shows how many perils currently have their override toggle enabled (e.g. &quot;3 overrides applied&quot;).</td></tr>
+<tr><td><code>unitOptions</code></td><td>Unit options</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>Choices offered by each row's unit dropdown. An object with an `items` array of { id, label }.</td></tr>
+<tr><td><code>perils</code></td><td>Perils</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>The list of perils. An object with an `items` array; each item: { id, name, required, zone, defaultText, enabled, value, unit }. (Wrapped in an object — a bare top-level array default breaks the production build.)</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <table class="tbl"><thead><tr><th>Event</th><th>Label</th><th>Payload</th><th>When / use</th></tr></thead><tbody><tr><td><code>PERIL_DEDUCTIBLE_CHANGED</code></td><td>Peril deductible changed</td><td><code>id</code><span class="muted">:string</span> &nbsp; <code>name</code><span class="muted">:string</span> &nbsp; <code>enabled</code><span class="muted">:boolean</span> &nbsp; <code>value</code><span class="muted">:string</span> &nbsp; <code>unit</code><span class="muted">:string</span></td><td>Fired when a row's override toggle, value, or unit changes. Payload: { id, name, enabled, value, unit }.</td></tr></tbody></table>
+    <h3>Sample input JSON</h3><h4><code>unitOptions</code></h4><div class="code"><button class="copy" data-target="peril-deductibles-unitOptions">Copy</button><pre id="peril-deductibles-unitOptions"><code>{
+  &quot;items&quot;: [
+    {
+      &quot;id&quot;: &quot;pct_tiv&quot;,
+      &quot;label&quot;: &quot;% TIV&quot;
+    },
+    {
+      &quot;id&quot;: &quot;amount&quot;,
+      &quot;label&quot;: &quot;$ Amount&quot;
+    },
+    {
+      &quot;id&quot;: &quot;pct_limit&quot;,
+      &quot;label&quot;: &quot;% Limit&quot;
+    }
+  ]
+}</code></pre></div>
+<h4><code>perils</code></h4><div class="code"><button class="copy" data-target="peril-deductibles-perils">Copy</button><pre id="peril-deductibles-perils"><code>{
+  &quot;items&quot;: [
+    {
+      &quot;id&quot;: &quot;wind&quot;,
+      &quot;name&quot;: &quot;Wind / Hurricane&quot;,
+      &quot;required&quot;: true,
+      &quot;zone&quot;: &quot;Coastal Zone&quot;,
+      &quot;defaultText&quot;: &quot;Default: 2% of TIV&quot;,
+      &quot;enabled&quot;: true,
+      &quot;value&quot;: &quot;2&quot;,
+      &quot;unit&quot;: &quot;pct_tiv&quot;
+    },
+    {
+      &quot;id&quot;: &quot;flood&quot;,
+      &quot;name&quot;: &quot;Flood&quot;,
+      &quot;required&quot;: true,
+      &quot;zone&quot;: &quot;Flood Zone A&quot;,
+      &quot;defaultText&quot;: &quot;Default: 5% of TIV&quot;,
+      &quot;enabled&quot;: true,
+      &quot;value&quot;: &quot;5&quot;,
+      &quot;unit&quot;: &quot;pct_tiv&quot;
+    },
+    {
+      &quot;id&quot;: &quot;earthquake&quot;,
+      &quot;name&quot;: &quot;Earthquake&quot;,
+      &quot;required&quot;: false,
+      &quot;zone&quot;: &quot;&quot;,
+      &quot;defaultText&quot;: &quot;Default: 10% of TIV&quot;,
+      &quot;enabled&quot;: false,
+      &quot;value&quot;: &quot;10&quot;,
+      &quot;unit&quot;: &quot;pct_tiv&quot;
+    },
+    {
+      &quot;id&quot;: &quot;hail&quot;,
+      &quot;name&quot;: &quot;Hail&quot;,
+      &quot;required&quot;: false,
+      &quot;zone&quot;: &quot;&quot;,
+      &quot;defaultText&quot;: &quot;Default: 1% of TIV&quot;,
+      &quot;enabled&quot;: true,
+      &quot;value&quot;: &quot;1&quot;,
+      &quot;unit&quot;: &quot;pct_tiv&quot;
+    }
+  ]
+}</code></pre></div>
+  </section>
+
+  <section class="comp" id="metric-card">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card frame -->
+  <rect x="5" y="9" width="38" height="30" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- KPI bars (rising) -->
+  <rect x="12" y="25" width="5" height="9" rx="1.5" fill="#474747"/>
+  <rect x="21.5" y="20" width="5" height="14" rx="1.5" fill="#474747"/>
+  <rect x="31" y="15" width="5" height="19" rx="1.5" fill="#474747"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Dashboard Metric Card</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-metric-card&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">14 props</span>
+          <span class="chip">1 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">A configurable KPI card: icon, heading, formatted value, and a trend pill (e.g. ↓ 4.2% MoM).</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="chip chip-now">now-card</span> <span class="chip chip-now">now-icon</span></p>
+    <figure class="shot"><img src="screens/metric-card.png" alt="Dashboard Metric Card preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>heading</code></td><td>Heading</td><td>string</td><td><code>Submissions to Quote Ratio</code></td><td>Title shown above the value.</td></tr>
+<tr><td><code>iconGlyph</code></td><td>Icon glyph</td><td>string</td><td><code>$</code></td><td>A literal glyph for the icon tile (text or emoji, e.g. $ or 📈). Always renders. Takes precedence over Icon. Leave empty to use a now-icon, or to hide the tile.</td></tr>
+<tr><td><code>icon</code></td><td>Icon (now-icon)</td><td>string</td><td><code></code></td><td>now-icon glyph name (e.g. currency-dollar-outline, chart-line-outline). Used only when Icon glyph is empty. Resolves from the instance icon library, so may render blank in a disconnected local preview.</td></tr>
+<tr><td><code>value</code></td><td>Value</td><td>string</td><td><code>25</code></td><td>The headline metric. A number or numeric string; formatted per the Value format property.</td></tr>
+<tr><td><code>format</code></td><td>Value format</td><td>choice <span class="muted">(percent · currency · number · none)</span></td><td><code>percent</code></td><td>How the value is rendered.</td></tr>
+<tr><td><code>decimals</code></td><td>Decimal places</td><td>number</td><td><code>2</code></td><td>Decimal places for the value and trend magnitude.</td></tr>
+<tr><td><code>currencySymbol</code></td><td>Currency symbol</td><td>string</td><td><code>$</code></td><td>Prefix used when Value format is Currency.</td></tr>
+<tr><td><code>trendValue</code></td><td>Trend value</td><td>string</td><td><code>-4.2</code></td><td>Change vs the previous period. The sign sets the arrow direction (auto); the magnitude is shown. Leave empty to hide the trend pill.</td></tr>
+<tr><td><code>trendDirection</code></td><td>Trend direction</td><td>choice <span class="muted">(auto · up · down · flat)</span></td><td><code>auto</code></td><td>Arrow direction. Auto derives it from the sign of the trend value.</td></tr>
+<tr><td><code>trendPeriod</code></td><td>Trend period</td><td>string</td><td><code>MoM</code></td><td>Caption beside the pill, e.g. MoM, YoY, vs last week.</td></tr>
+<tr><td><code>trendPositiveIsGood</code></td><td>Increase is positive</td><td>boolean</td><td><code>true</code></td><td>When on, an upward trend is green and downward is red. Turn off for lower-is-better metrics (cost, churn, latency).</td></tr>
+<tr><td><code>iconColor</code></td><td>Icon color</td><td>string</td><td><code></code></td><td>Optional CSS color for the icon glyph. Empty uses the theme default.</td></tr>
+<tr><td><code>iconBackgroundColor</code></td><td>Icon background color</td><td>string</td><td><code></code></td><td>Optional CSS color for the icon tile background. Empty uses the theme default.</td></tr>
+<tr><td><code>clickable</code></td><td>Clickable</td><td>boolean</td><td><code>false</code></td><td>When on, the card is focusable and emits a 'Metric card clicked' event.</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <table class="tbl"><thead><tr><th>Event</th><th>Label</th><th>Payload</th><th>When / use</th></tr></thead><tbody><tr><td><code>METRIC_CARD_CLICKED</code></td><td>Metric card clicked</td><td><code>heading</code><span class="muted">:string</span> &nbsp; <code>value</code><span class="muted">:string</span></td><td>Fired when a clickable card is activated by click or keyboard. Payload: { heading, value }.</td></tr></tbody></table>
+    
+  </section>
+
+  <section class="comp" id="collapse">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Header bar -->
+  <rect x="6" y="9" width="36" height="11" rx="3" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Chevron in header -->
+  <path d="M31 13l3 3 3-3" fill="none" stroke="#474747" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Expanded content -->
+  <rect x="6" y="24" width="36" height="15" rx="3" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <line x1="11" y1="29.5" x2="33" y2="29.5" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <line x1="11" y1="34" x2="27" y2="34" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Collapse / Expand Panel</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-collapse&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">9 props</span>
+          <span class="chip">0 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">A fully custom collapsible panel: a clickable header with a chevron or +/- trigger that shows or hides its content. Stack several to build an accordion.</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="muted">none — fully custom</span></p>
+    <figure class="shot"><img src="screens/collapse.png" alt="Collapse / Expand Panel preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>headingText</code></td><td>Heading</td><td>string</td><td><code>Section title</code></td><td>The label shown in the header. Selecting the header toggles the content.</td></tr>
+<tr><td><code>bodyText</code></td><td>Body text</td><td>string</td><td><code>Place any content here. In UI Builder you can drop other components into this panel's slot; this text shows when the slot is empty.</code></td><td>Fallback text shown in the content area when nothing is placed in the component's slot. Leave empty if you only want slotted content.</td></tr>
+<tr><td><code>expanded</code></td><td>Expanded by default</td><td>boolean</td><td><code>false</code></td><td>Whether the panel starts open when the page loads.</td></tr>
+<tr><td><code>triggerIcon</code></td><td>Trigger icon</td><td>choice <span class="muted">(chevron · plusminus)</span></td><td><code>chevron</code></td><td>The icon that indicates open/closed state.</td></tr>
+<tr><td><code>iconPosition</code></td><td>Icon position</td><td>choice <span class="muted">(right · left)</span></td><td><code>right</code></td><td>Whether the trigger icon sits on the left or right of the heading.</td></tr>
+<tr><td><code>bordered</code></td><td>Show border</td><td>boolean</td><td><code>false</code></td><td>Optional. When on, the panel is wrapped in a rounded border/card. Off by default for the clean, flat look.</td></tr>
+<tr><td><code>disabled</code></td><td>Disabled</td><td>boolean</td><td><code>false</code></td><td>When on, the header can't be toggled.</td></tr>
+<tr><td><code>contentSizing</code></td><td>Content sizing</td><td>choice <span class="muted">(grow · fixed)</span></td><td><code>grow</code></td><td>How the content area is sized. Grow to fit: the area grows with the content (use Content height as a minimum floor) — best for a Playbook. Fixed: exact height, scrolls inside.</td></tr>
+<tr><td><code>contentHeight</code></td><td>Content height</td><td>string</td><td><code>60vh</code></td><td>A CSS length, e.g. 60vh or 500px. In Grow to fit mode it's the MINIMUM height (the area grows taller as needed). In Fixed mode it's the exact height. Required when embedding a component that sizes to its parent (like a Playbook), which otherwise renders at ~0 height.</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <p class="muted">No external events — this component has no state an outside page needs to bind.</p>
+    
+  </section>
+
+  <section class="comp" id="dynamic-form">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card -->
+  <rect x="5" y="7" width="38" height="34" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Section title -->
+  <line x1="11" y1="14" x2="26" y2="14" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Field boxes (2 cols) -->
+  <rect x="11" y="19" width="12" height="6" rx="2" fill="none" stroke="#474747" stroke-width="1.6"/>
+  <rect x="25" y="19" width="12" height="6" rx="2" fill="none" stroke="#474747" stroke-width="1.6"/>
+  <rect x="11" y="28" width="12" height="6" rx="2" fill="none" stroke="#474747" stroke-width="1.6"/>
+  <rect x="25" y="28" width="12" height="6" rx="2" fill="#474747"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Dynamic Form</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-dynamic-form&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">5 props</span>
+          <span class="chip">2 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">A metadata-driven sectioned form: section cards with a multi-column grid of select / text / read-only fields. Values bind to a record; Save fires FORM_SAVED for a REST data resource.</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="muted">none — fully custom</span></p>
+    <figure class="shot"><img src="screens/dynamic-form.png" alt="Dynamic Form preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>sections</code></td><td>Sections (JSON array)</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>Grouping metadata. Each: { sectionName, fields:[{ label, name, type:'select'|'text', options, placeholder, readonly, value }] }. Bind your external metadata here.</td></tr>
+<tr><td><code>values</code></td><td>Values (JSON object)</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>Current field values keyed by field name. Bind your table record here; the form updates this as the user edits.</td></tr>
+<tr><td><code>columns</code></td><td>Columns</td><td>number</td><td><code>3</code></td><td>Number of fields per row in each section.</td></tr>
+<tr><td><code>saveLabel</code></td><td>Save button text</td><td>string</td><td><code>Save</code></td><td>Label for the Save button.</td></tr>
+<tr><td><code>showSave</code></td><td>Show Save button</td><td>boolean</td><td><code>true</code></td><td>When on, shows the Save button that fires FORM_SAVED.</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <table class="tbl"><thead><tr><th>Event</th><th>Label</th><th>Payload</th><th>When / use</th></tr></thead><tbody><tr><td><code>FIELD_CHANGED</code></td><td>Field changed</td><td><code>name</code><span class="muted">:string</span> &nbsp; <code>value</code><span class="muted">:string</span></td><td>Fired when any field changes. Payload: { name, value }.</td></tr>
+<tr><td><code>FORM_SAVED</code></td><td>Form saved</td><td><code>values</code><span class="muted">:json</span></td><td>Fired when Save is clicked. Payload: { values }. Bind to a REST/transform data resource to perform the HTTP save.</td></tr></tbody></table>
+    <h3>Sample input JSON</h3><h4><code>sections</code></h4><div class="code"><button class="copy" data-target="dynamic-form-sections">Copy</button><pre id="dynamic-form-sections"><code>[]</code></pre></div>
+<h4><code>values</code></h4><div class="code"><button class="copy" data-target="dynamic-form-values">Copy</button><pre id="dynamic-form-values"><code>{}</code></pre></div>
+  </section>
+
+  <section class="comp" id="endorsement-card">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card -->
+  <rect x="5" y="8" width="38" height="32" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Title line -->
+  <line x1="11" y1="15" x2="30" y2="15" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Pills -->
+  <rect x="11" y="20" width="8" height="5" rx="2.5" fill="#474747"/>
+  <rect x="22" y="20" width="11" height="5" rx="2.5" fill="none" stroke="#474747" stroke-width="1.6"/>
+  <!-- Action button -->
+  <rect x="11" y="31" width="26" height="5" rx="2.5" fill="none" stroke="#474747" stroke-width="1.8"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Endorsement Card</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-endorsement-card&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">8 props</span>
+          <span class="chip">1 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">A single endorsement/clause card: title, colored category pills, description, gray meta tags, and a required / add / remove action button. Drop several to build a clause library grid.</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="muted">none — fully custom</span></p>
+    <figure class="shot"><img src="screens/endorsement-card.png" alt="Endorsement Card preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>title</code></td><td>Title</td><td>string</td><td><code>Commercial General Liability Coverage</code></td><td>Endorsement / clause name.</td></tr>
+<tr><td><code>categoryTags</code></td><td>Category pills (JSON array)</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>Colored status/category pills. Each item: { label, color }. color = blue | red | green | purple | orange | gray.</td></tr>
+<tr><td><code>description</code></td><td>Description</td><td>string</td><td><code></code></td><td>Short description shown under the pills.</td></tr>
+<tr><td><code>metaTags</code></td><td>Meta tags (JSON array)</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>Plain gray tags, e.g. Auto-applied, Suggested, Requires approval. Array of strings or { label }.</td></tr>
+<tr><td><code>actionType</code></td><td>Action type</td><td>choice <span class="muted">(required · add · remove · none)</span></td><td><code>required</code></td><td>Which action button to show.</td></tr>
+<tr><td><code>actionLabel</code></td><td>Action button text</td><td>string</td><td><code></code></td><td>Override the button text. Empty uses the default for the action type (Required / + Add / × Remove).</td></tr>
+<tr><td><code>collapsible</code></td><td>Collapsible</td><td>boolean</td><td><code>false</code></td><td>When on, the chevron toggles the card body. Off (default) shows everything; the chevron is decorative.</td></tr>
+<tr><td><code>expanded</code></td><td>Expanded</td><td>boolean</td><td><code>true</code></td><td>When Collapsible is on, whether the body starts open.</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <table class="tbl"><thead><tr><th>Event</th><th>Label</th><th>Payload</th><th>When / use</th></tr></thead><tbody><tr><td><code>ACTION_CLICKED</code></td><td>Action clicked</td><td><code>type</code><span class="muted">:string</span></td><td>Fired when Add or Remove is clicked (not for Required). Payload: { type }.</td></tr></tbody></table>
+    <h3>Sample input JSON</h3><h4><code>categoryTags</code></h4><div class="code"><button class="copy" data-target="endorsement-card-categoryTags">Copy</button><pre id="endorsement-card-categoryTags"><code>[]</code></pre></div>
+<h4><code>metaTags</code></h4><div class="code"><button class="copy" data-target="endorsement-card-metaTags">Copy</button><pre id="endorsement-card-metaTags"><code>[]</code></pre></div>
+  </section>
+
+  <section class="comp" id="extraction-summary">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card -->
+  <rect x="5" y="11" width="38" height="26" rx="4" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Check circle -->
+  <circle cx="13" cy="19" r="3.5" fill="none" stroke="#474747" stroke-width="2"/>
+  <!-- Badge -->
+  <rect x="22" y="16" width="14" height="6" rx="3" fill="#474747"/>
+  <!-- Stat lines -->
+  <line x1="11" y1="28" x2="25" y2="28" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <line x1="11" y1="32.5" x2="37" y2="32.5" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Extraction Summary Card</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-extraction-summary&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">5 props</span>
+          <span class="chip">3 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">A custom version/extraction summary: a version dropdown plus a green summary card (name, CURRENT badge, created/triggered-by, document &amp; field stats, low-confidence warning). Driven by a JSON array; the dropdown switches the displayed version.</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="muted">none — fully custom</span></p>
+    <figure class="shot"><img src="screens/extraction-summary.png" alt="Extraction Summary Card preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>versions</code></td><td>Versions (JSON array)</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>Array of version objects. Each item: { id, label, name, current, created, triggeredBy, documents, totalFields, newFields, modified, lowConfidence }. Bind a data resource here.</td></tr>
+<tr><td><code>selectedId</code></td><td>Selected version id</td><td>string</td><td><code></code></td><td>Which version's id is shown. Empty shows the first item. Updated automatically when the dropdown changes.</td></tr>
+<tr><td><code>versionLabel</code></td><td>Picker label</td><td>string</td><td><code>Version:</code></td><td>Small label shown above the dropdown.</td></tr>
+<tr><td><code>button1Label</code></td><td>Button 1 label</td><td>string</td><td><code>View Extraction Timeline</code></td><td>Left action button (has a clock icon).</td></tr>
+<tr><td><code>button2Label</code></td><td>Button 2 label</td><td>string</td><td><code>Proceed to Data Audit</code></td><td>Right action button.</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <table class="tbl"><thead><tr><th>Event</th><th>Label</th><th>Payload</th><th>When / use</th></tr></thead><tbody><tr><td><code>VERSION_CHANGED</code></td><td>Version changed</td><td><code>id</code><span class="muted">:string</span></td><td>Fired when the dropdown selection changes. Payload: { id }.</td></tr>
+<tr><td><code>VIEW_TIMELINE_CLICKED</code></td><td>View timeline clicked</td><td><code>id</code><span class="muted">:string</span></td><td>Fired when the View timeline button is clicked. Payload: { id }.</td></tr>
+<tr><td><code>PROCEED_TO_AUDIT_CLICKED</code></td><td>Proceed to audit clicked</td><td><code>id</code><span class="muted">:string</span></td><td>Fired when the Proceed to audit button is clicked. Payload: { id }.</td></tr></tbody></table>
+    <h3>Sample input JSON</h3><h4><code>versions</code></h4><div class="code"><button class="copy" data-target="extraction-summary-versions">Copy</button><pre id="extraction-summary-versions"><code>[]</code></pre></div>
+  </section>
+
+  <section class="comp" id="toggle-card">
+    <div class="comp-head">
+      <span class="comp-icon"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card -->
+  <rect x="5" y="9" width="38" height="30" rx="5" fill="none" stroke="#474747" stroke-width="2.5"/>
+  <!-- Row 1: label + switch (on) -->
+  <line x1="11" y1="19" x2="20" y2="19" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <rect x="29" y="15.5" width="11" height="7" rx="3.5" fill="#474747"/>
+  <circle cx="36.5" cy="19" r="2.3" fill="#ffffff"/>
+  <!-- Row 2: label + switch (off) -->
+  <line x1="11" y1="29" x2="20" y2="29" stroke="#474747" stroke-width="2.2" stroke-linecap="round"/>
+  <rect x="29" y="25.5" width="11" height="7" rx="3.5" fill="none" stroke="#474747" stroke-width="1.6"/>
+  <circle cx="32.5" cy="29" r="2.3" fill="#474747"/>
+</svg>
+</span>
+      <div class="comp-head-main">
+        <h2>Toggle Card</h2>
+        <div class="tags">
+          <span class="chip chip-tag">&lt;x-gegis-library-toggle-card&gt;</span>
+          <span class="chip">primitives</span>
+          <span class="chip">5 props</span>
+          <span class="chip">1 events</span>
+        </div>
+      </div>
+    </div>
+    <p class="desc">A single titled card with a list of on/off toggle rows (with optional required asterisk). Driven by a JSON array; drop several to build a grid.</p>
+    <p class="inner"><strong>Standard components used:</strong> <span class="muted">none — fully custom</span></p>
+    <figure class="shot"><img src="screens/toggle-card.png" alt="Toggle Card preview" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>Sample preview (local).</figcaption></figure>
+    <h3>Properties</h3>
+    <table class="tbl"><thead><tr><th>Property</th><th>Label</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>title</code></td><td>Card title</td><td>string</td><td><code>Core Property</code></td><td>Heading shown at the top of the card.</td></tr>
+<tr><td><code>items</code></td><td>Items (JSON array)</td><td>json</td><td><span class="muted">see sample ▾</span></td><td>Toggle rows. Each item: { label, on (boolean), required (boolean) }. Bind a data resource or paste JSON.</td></tr>
+<tr><td><code>onLabel</code></td><td>On text</td><td>string</td><td><code>On</code></td><td>Text shown next to a toggle when it is on.</td></tr>
+<tr><td><code>offLabel</code></td><td>Off text</td><td>string</td><td><code>Off</code></td><td>Text shown next to a toggle when it is off.</td></tr>
+<tr><td><code>showStateText</code></td><td>Show On/Off text</td><td>boolean</td><td><code>true</code></td><td>When on, shows the On/Off label beside each toggle.</td></tr></tbody></table>
+    <h3>Events</h3>
+    
+    <table class="tbl"><thead><tr><th>Event</th><th>Label</th><th>Payload</th><th>When / use</th></tr></thead><tbody><tr><td><code>TOGGLE_CHANGED</code></td><td>Toggle changed</td><td><code>index</code><span class="muted">:number</span> &nbsp; <code>label</code><span class="muted">:string</span> &nbsp; <code>on</code><span class="muted">:boolean</span></td><td>Fired when a row's toggle is switched. Payload: { index, label, on }.</td></tr></tbody></table>
+    <h3>Sample input JSON</h3><h4><code>items</code></h4><div class="code"><button class="copy" data-target="toggle-card-items">Copy</button><pre id="toggle-card-items"><code>[]</code></pre></div>
+  </section>
+
+    <footer>Generated from each component's <code>now-ui.json</code> · 11 components · built 2026-06-01 · scope <code>x_gegis_library</code>.</footer>
+  </main>
+</div>
+<script>
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el=document.getElementById(btn.dataset.target), text=el?el.innerText:'';
+      navigator.clipboard.writeText(text).then(function(){var o=btn.textContent;btn.textContent='Copied!';btn.classList.add('done');setTimeout(function(){btn.textContent=o;btn.classList.remove('done');},1400);});
+    });
+  });
+</script>
+</body>
+</html>
