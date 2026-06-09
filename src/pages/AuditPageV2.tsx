@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import apiService, { Field } from '../services/apiService'
 import authService from '../services/authService'
 import { useToast } from '../context/ToastContext'
@@ -183,6 +183,8 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
   const [fields, setFields] = useState<Field[]>([])
   const [submissionNumber, setSubmissionNumber] = useState('')
   const [submissionStatus, setSubmissionStatus] = useState('')
+  const [dataVerificationEditStatuses, setDataVerificationEditStatuses] = useState<string[]>([])
+  const [qaOverrideEditStatuses, setQaOverrideEditStatuses] = useState<string[]>([])
   const [versions, setVersions] = useState<VersionItem[]>([])
   const [selectedVersionSysId, setSelectedVersionSysId] = useState('')
   const [isReadOnlyVersion, setIsReadOnlyVersion] = useState(false)
@@ -208,6 +210,16 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [dirtyFieldIds, setDirtyFieldIds] = useState<Set<string>>(new Set())
   const [showKeyHelp, setShowKeyHelp] = useState(false)
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [autoSaveMessage, setAutoSaveMessage] = useState('')
+  const fieldsRef = useRef<Field[]>([])
+  const submissionNumberRef = useRef('')
+  const dirtyFieldIdsRef = useRef<Set<string>>(new Set())
+  const isReadOnlyVersionRef = useRef(false)
+  const canEditDataVerificationRef = useRef(false)
+  const canEditQaOverrideRef = useRef(false)
+  const autoSaveResetTimerRef = useRef<number | null>(null)
+  const autoSaveDebounceTimersRef = useRef<Map<string, number>>(new Map())
   const { showToast } = useToast()
 
   useEffect(() => {
@@ -220,13 +232,16 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
           return
         }
 
-        const [, mappingResponse] = await Promise.all([
-          apiService.getConfig(),
-          apiService.fetchMapping(submissionSysId)
-        ])
+        const mappingResponse = await apiService.fetchMapping(submissionSysId)
 
         const nextFields = mappingResponse.fields || []
         setFields(nextFields)
+
+        const responseConfig = mappingResponse.result?.config
+        if (responseConfig) {
+          setDataVerificationEditStatuses(responseConfig.dataVerificationEditStatuses || [])
+          setQaOverrideEditStatuses(responseConfig.qaOverrideEditStatuses || [])
+        }
 
         const apiResponse = mappingResponse.result
         if (apiResponse?.submissionNumber) {
@@ -235,8 +250,22 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
         if (apiResponse?.submissionStatusChoice) {
           setSubmissionStatus(apiResponse.submissionStatusChoice)
         }
+
+        console.log('[AuditV2] gating inputs:', {
+          submissionStatusChoice: apiResponse?.submissionStatusChoice,
+          dataVerificationEditStatuses: responseConfig?.dataVerificationEditStatuses,
+          qaOverrideEditStatuses: responseConfig?.qaOverrideEditStatuses,
+          selectedDataExtract: (apiResponse as { selectedDataExtract?: { sys_id: string; active: boolean } })?.selectedDataExtract,
+          versionCount: apiResponse?.versions?.length || 0
+        })
         if (apiResponse?.versions && Array.isArray(apiResponse.versions)) {
           setVersions(apiResponse.versions)
+        }
+
+        if (apiResponse?.selectedDataExtract) {
+          setSelectedVersionSysId(apiResponse.selectedDataExtract.sys_id)
+          setIsReadOnlyVersion(!apiResponse.selectedDataExtract.active)
+        } else if (apiResponse?.versions && Array.isArray(apiResponse.versions) && apiResponse.versions.length) {
           const fromUrl = versionId
             ? apiResponse.versions.find((version) => version.sys_id === versionId)
             : null
@@ -245,6 +274,8 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
             setSelectedVersionSysId(selectedVersion.sys_id)
             setIsReadOnlyVersion(!selectedVersion.active)
           }
+        } else {
+          setIsReadOnlyVersion(false)
         }
 
         const documentNames = Array.from(
@@ -267,11 +298,11 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
 
         showToast(`Loaded ${nextFields.length} extracted mappings`, 'success', 2500)
       } catch (error) {
-        showToast(
-          `Failed to load data: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          'error',
-          8000
-        )
+        // showToast(
+        //   `Failed to load data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        //   'error',
+        //   8000
+        // )
       } finally {
         setLoading(false)
       }
@@ -475,6 +506,116 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
     setShowAiSummary(true)
   }, [selectedDocument])
 
+  const canEditDataVerification = !isReadOnlyVersion && dataVerificationEditStatuses.includes(submissionStatus)
+  const canEditQaOverride = !isReadOnlyVersion && qaOverrideEditStatuses.includes(submissionStatus)
+  const canEditCommentary = canEditDataVerification || canEditQaOverride
+
+  useEffect(() => { fieldsRef.current = fields }, [fields])
+  useEffect(() => { submissionNumberRef.current = submissionNumber }, [submissionNumber])
+  useEffect(() => { dirtyFieldIdsRef.current = dirtyFieldIds }, [dirtyFieldIds])
+  useEffect(() => { isReadOnlyVersionRef.current = isReadOnlyVersion }, [isReadOnlyVersion])
+  useEffect(() => { canEditDataVerificationRef.current = canEditDataVerification }, [canEditDataVerification])
+  useEffect(() => { canEditQaOverrideRef.current = canEditQaOverride }, [canEditQaOverride])
+  useEffect(() => () => {
+    if (autoSaveResetTimerRef.current !== null) {
+      window.clearTimeout(autoSaveResetTimerRef.current)
+    }
+    autoSaveDebounceTimersRef.current.forEach((handle) => window.clearTimeout(handle))
+    autoSaveDebounceTimersRef.current.clear()
+  }, [])
+
+  const flashAutoSaveStatus = (status: 'saved' | 'error', message: string) => {
+    setAutoSaveStatus(status)
+    setAutoSaveMessage(message)
+    if (autoSaveResetTimerRef.current !== null) {
+      window.clearTimeout(autoSaveResetTimerRef.current)
+    }
+    autoSaveResetTimerRef.current = window.setTimeout(() => {
+      setAutoSaveStatus('idle')
+      setAutoSaveMessage('')
+      autoSaveResetTimerRef.current = null
+    }, status === 'error' ? 4000 : 1800)
+  }
+
+  const autoSaveField = async (fieldId: string) => {
+    const field = fieldsRef.current.find((item) => item.sys_id === fieldId)
+    if (!field) {
+      console.warn('[autoSaveField] no field for sys_id', fieldId)
+      return
+    }
+    if (isReadOnlyVersionRef.current) {
+      console.warn('[autoSaveField] skipped — read-only version', fieldId)
+      return
+    }
+    if (!canEditDataVerificationRef.current && !canEditQaOverrideRef.current) {
+      console.warn('[autoSaveField] skipped — status not in any edit list', {
+        fieldId,
+        canEditDataVerification: canEditDataVerificationRef.current,
+        canEditQaOverride: canEditQaOverrideRef.current
+      })
+      return
+    }
+    if (!dirtyFieldIdsRef.current.has(fieldId)) {
+      console.info('[autoSaveField] skipped — field not dirty', fieldId)
+      return
+    }
+
+    const submissionNumberValue = submissionNumberRef.current
+    if (!submissionNumberValue) {
+      console.warn('[autoSaveField] skipped — submissionNumber not loaded yet')
+      return
+    }
+
+    const overrideValue = (field.qa_override_value || '').trim()
+    const commentaryValue = (field.commentary || '').trim()
+    if (overrideValue && !commentaryValue) {
+      console.info('[autoSaveField] blocked — QA Override set without Commentary', fieldId)
+      showToast(`Commentary required when QA Override is set for "${field.field_name || 'this field'}"`, 'warning', 4500)
+      return
+    }
+
+    try {
+      console.info('[autoSaveField] POST saveMapping', { fieldId, fieldName: field.field_name })
+      setAutoSaveStatus('saving')
+      setAutoSaveMessage(`Saving ${field.field_name || 'field'}…`)
+      await apiService.saveMapping({
+        submissionNumber: submissionNumberValue,
+        dataExtractSysId: submissionSysId,
+        updates: [{
+          sys_id: field.sys_id,
+          qa_override_value: field.qa_override_value || '',
+          data_verification: field.data_verification || '',
+          commentary: field.commentary || ''
+        }]
+      })
+      setDirtyFieldIds((previous) => {
+        if (!previous.has(fieldId)) return previous
+        const next = new Set(previous)
+        next.delete(fieldId)
+        if (next.size === 0) setHasChanges(false)
+        return next
+      })
+      flashAutoSaveStatus('saved', `Saved ${field.field_name || 'field'}`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Save failed'
+      console.error('[autoSaveField] save failed', error)
+      flashAutoSaveStatus('error', message)
+      showToast(`Save failed for "${field.field_name || 'field'}": ${message}`, 'error', 5000)
+    }
+  }
+
+  const scheduleAutoSave = (fieldId: string, delay = 600) => {
+    const existing = autoSaveDebounceTimersRef.current.get(fieldId)
+    if (existing) {
+      window.clearTimeout(existing)
+    }
+    const handle = window.setTimeout(() => {
+      autoSaveDebounceTimersRef.current.delete(fieldId)
+      void autoSaveField(fieldId)
+    }, delay)
+    autoSaveDebounceTimersRef.current.set(fieldId, handle)
+  }
+
   const handleFieldChange = (fieldId: string, updates: Partial<Field>) => {
     setFields((previousFields) =>
       previousFields.map((field) => (
@@ -483,11 +624,12 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
     )
     setHasChanges(true)
     setDirtyFieldIds((previous) => {
-      if (previous.has(fieldId)) return previous
       const next = new Set(previous)
       next.add(fieldId)
+      dirtyFieldIdsRef.current = next
       return next
     })
+    scheduleAutoSave(fieldId)
   }
 
   const toggleGroupCollapsed = (title: string) => {
@@ -503,6 +645,7 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
   }
 
   const handleOverrideChange = (field: Field, value: string) => {
+    if (!canEditQaOverride) return
     handleFieldChange(field.sys_id, {
       qa_override_value: value,
       data_verification: value.trim() ? field.data_verification || field.field_value : field.data_verification
@@ -510,6 +653,7 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
   }
 
   const handleToggleConflict = (field: Field) => {
+    if (!canEditCommentary) return
     const commentary = (field.commentary || '').trim()
     const flagged = hasConflictMarker(commentary)
     const nextCommentary = flagged
@@ -613,6 +757,7 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
   }
 
   const handleAcceptField = (field: Field) => {
+    if (!canEditDataVerification) return
     const acceptedValue = field.field_value?.trim() || getResolvedValue(field)
     if (!acceptedValue) {
       showToast(`No extracted value available for ${field.field_name}`, 'warning', 4000)
@@ -626,6 +771,7 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
   }
 
   const handleAcceptAllHighConfidence = () => {
+    if (!canEditDataVerification) return
     const acceptedIds: string[] = []
 
     setFields((previousFields) => previousFields.map((field) => {
@@ -1018,7 +1164,13 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
               </div>
 
               <div className="audit-v2-mapping-toolbar-row">
-                <button type="button" className="audit-v2-outline-button small" onClick={handleAcceptAllHighConfidence}>
+                <button
+                  type="button"
+                  className="audit-v2-outline-button small"
+                  onClick={handleAcceptAllHighConfidence}
+                  disabled={!canEditDataVerification || saving || completing}
+                  title={canEditDataVerification ? 'Accept high-confidence mappings on this document' : 'Verification is not editable in the current submission status'}
+                >
                   <i className="fas fa-check" />
                   Accept high-conf
                 </button>
@@ -1177,7 +1329,8 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                                     event.stopPropagation()
                                     handleAcceptField(field)
                                   }}
-                                  disabled={saving || completing || isReadOnlyVersion}
+                                  disabled={saving || completing || !canEditDataVerification}
+                                  title={canEditDataVerification ? 'Accept the AI value' : 'Verification is not editable in the current submission status'}
                                 >
                                   <i className="fas fa-check" />
                                   Accept
@@ -1189,7 +1342,8 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                                     event.stopPropagation()
                                     handleToggleConflict(field)
                                   }}
-                                  disabled={saving || completing || isReadOnlyVersion}
+                                  disabled={saving || completing || !canEditCommentary}
+                                  title={canEditCommentary ? 'Flag this field as a conflict' : 'Commentary is not editable in the current submission status'}
                                 >
                                   <i className="fas fa-triangle-exclamation" />
                                   {isConflictFlagged ? 'Clear' : 'Conflict'}
@@ -1201,7 +1355,8 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                                     event.stopPropagation()
                                     setOverrideEditorFieldId((currentValue) => currentValue === field.sys_id ? '' : field.sys_id)
                                   }}
-                                  disabled={saving || completing || isReadOnlyVersion}
+                                  disabled={saving || completing || !canEditQaOverride}
+                                  title={canEditQaOverride ? 'Open the override editor' : 'QA Override is not editable in the current submission status'}
                                 >
                                   <i className="fas fa-pen" />
                                   Override
@@ -1213,8 +1368,16 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
                                   <input
                                     value={field.qa_override_value || ''}
                                     onChange={(event) => handleOverrideChange(field, event.target.value)}
+                                    onBlur={() => {
+                                      const handle = autoSaveDebounceTimersRef.current.get(field.sys_id)
+                                      if (handle) {
+                                        window.clearTimeout(handle)
+                                        autoSaveDebounceTimersRef.current.delete(field.sys_id)
+                                      }
+                                      void autoSaveField(field.sys_id)
+                                    }}
                                     onClick={(event) => event.stopPropagation()}
-                                    disabled={saving || completing || isReadOnlyVersion}
+                                    disabled={saving || completing || !canEditQaOverride}
                                     className="audit-v2-field-input compact"
                                     placeholder={extractedValue || 'Add override'}
                                   />
@@ -1288,6 +1451,14 @@ export const AuditPageV2: React.FC<AuditPageV2Props> = ({
               <div className="audit-v2-footer-meta">
                 <i className="far fa-clock" />
                 <span>Validated in <strong>1m 14s</strong></span>
+                {autoSaveStatus !== 'idle' && (
+                  <span className={`audit-v2-autosave audit-v2-autosave-${autoSaveStatus}`}>
+                    {autoSaveStatus === 'saving' && <i className="fas fa-spinner fa-spin" />}
+                    {autoSaveStatus === 'saved' && <i className="fas fa-check" />}
+                    {autoSaveStatus === 'error' && <i className="fas fa-triangle-exclamation" />}
+                    <span>{autoSaveMessage}</span>
+                  </span>
+                )}
                 {!!versions.length && (
                   <select
                     className="audit-v2-version-select"
